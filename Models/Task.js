@@ -23,5 +23,6 @@ export default class Task {
         this.importance = importance;
         this.reminderAt = reminderAt  && reminderAt.toISOString();
         this.createDate = new Date().toISOString();
+        this.completedAt = void 0;
     }
 }

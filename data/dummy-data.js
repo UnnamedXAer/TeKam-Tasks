@@ -37,6 +37,20 @@ export const myTasks = [
         new Date(2020, 1, 9, 17, 25, 0, 0)
     ),
     new Task(
+        'Take a shower',
+        '',
+        true,
+        ImportanceLevel.NORMAL,
+        new Date(2020, 1, 9, 17, 25, 0, 0)
+    ),
+    new Task(
+        'Add more elements to dummy data',
+        'There is need for more compled tasks in dummy data :)',
+        true,
+        ImportanceLevel.IMPORTANT,
+        new Date(2020, 1, 9, 17, 25, 0, 0)
+    ),
+    new Task(
         'Make Dinner',
         'Prepare a lunch boxes for next days',
         false,
@@ -46,7 +60,7 @@ export const myTasks = [
     new Task(
         'Take Out Laundry',
         'Make app working (minimal viable product)',
-        false,
+        true,
         ImportanceLevel.IMPORTANT,
         new Date(2020, 1, 9, 12, 38, 0, 0)
     ),
@@ -63,4 +77,9 @@ export const myTasks = [
         true,
         ImportanceLevel.IMPORTANT
     ),
-]
+].map(x => {
+    if (x.isCompleted)  {
+        x.completedAt = new Date().toISOString();
+    } 
+    return x;
+})

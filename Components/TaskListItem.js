@@ -1,12 +1,13 @@
-import React from 'react'
-import { View, Text, StyleSheet, Platform } from 'react-native'
+import React from 'react';
+import { View, Text, StyleSheet, Platform } from 'react-native';
+import { Feather } from '@expo/vector-icons';
 import Card from './Card';
 import Colors from '../Constants/Colors';
 import { TouchableOpacity, TouchableNativeFeedback } from 'react-native-gesture-handler';
 import { dateToLocalString } from '../Utils/time';
 import ImportanceLevel from '../Constants/ImportanceLevels';
 
-const TaskListItem = ({ task }) => {
+const TaskListItem = ({ task, onTaskComplete }) => {
 
     let TouchableComponent = TouchableOpacity;
     if (Platform.OS === 'android' && Platform.Version >= 21) {
@@ -19,8 +20,11 @@ const TaskListItem = ({ task }) => {
                 <View style={styles.titleWrapper}>
                     <Text style={styles.title} numberOfLines={2}>{task.title}</Text>
                     <View style={styles.completeTaskWrapper}>
-                        <TouchableComponent style={styles.completeTask}>
-                            <View ></View>
+                        <TouchableComponent 
+                            style={{...styles.completeTask, 
+                            backgroundColor: task.isCompleted ? Colors.secondary : ''}} 
+                            onPress={onTaskComplete}>
+                            <Feather name="check" size={28} color={task.isCompleted ? Colors.pDark : 'rgba(0,0,0,0.1)'} />
                         </TouchableComponent>
                     </View>
                 </View>
@@ -45,6 +49,9 @@ const TaskListItem = ({ task }) => {
                 <View style={styles.descriptionWrapper}>
                     <Text style={styles.description} numberOfLines={3}>{task.description}</Text>
                 </View>
+                {task.isCompleted && <View style={styles.completedWrapper}>
+                    <Text style={styles.detailText}>Completed at {dateToLocalString(task.completedAt)}</Text>
+                    </View>}
             </View>
         </Card>);
 };
@@ -91,6 +98,10 @@ const styles = StyleSheet.create({
     },
     description: {
 
+    },
+    completedWrapper: {
+        marginTop: 10,
+        alignSelf: 'flex-end'
     }
 });
 

@@ -1,19 +1,31 @@
-import React from 'react'
-import { View, Text, StyleSheet, ScrollView } from 'react-native'
-import Header from '../Components/Header'
+import React from 'react';
+import { View, StyleSheet, FlatList } from 'react-native';
+import Header from '../Components/Header';
+import TaskListItem from '../Components/TaskListItem';
+import { myTasks } from '../data/dummy-data';
 
 const TasksScreen = (props) => {
+
     return (
-        <ScrollView style={styles.screen}>
+        <View style={styles.screen}>
             <Header>Tasks to Complete</Header>
-        </ScrollView>
+            <FlatList
+                style={styles.tasksList}
+                data={myTasks}
+                keyExtractor={(item, _) => item.id}
+                renderItem={itemData => <TaskListItem task={itemData.item} />}
+            />
+        </View>
     )
 }
 
 const styles = StyleSheet.create({
     screen: {
-        flex: 1
+        flex: 1,
+    },
+    tasksList: {
+        flex: 1,
     }
-})
+});
 
 export default TasksScreen;

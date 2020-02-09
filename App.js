@@ -1,9 +1,9 @@
 import React from 'react';
 import { AppLoading } from 'expo';
-import { useScreens } from 'react-native-screens';
+import { enableScreens } from 'react-native-screens';
 import AppNavigator from './Navigation/AppNavigator';
 
-useScreens();
+enableScreens();
 
 export default function App() {
   return (

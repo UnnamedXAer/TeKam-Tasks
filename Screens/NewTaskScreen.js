@@ -2,10 +2,11 @@ import React from 'react'
 import { View, Text, StyleSheet, ScrollView } from 'react-native'
 import Header from '../Components/Header'
 
-const Tasks = () => {
+const NewTaskScreen = (props) => {
     return (
         <ScrollView style={styles.screen}>
-            <Header>Tasks to Complete</Header>
+            <Header>Add New Task</Header>
+
         </ScrollView>
     )
 }
@@ -16,4 +17,4 @@ const styles = StyleSheet.create({
     }
 })
 
-export default Tasks;
+export default NewTaskScreen;

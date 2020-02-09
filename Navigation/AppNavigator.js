@@ -1,11 +1,162 @@
+import React from 'react';
+import { Platform } from 'react-native';
 import { createStackNavigator } from "react-navigation-stack";
 import { createAppContainer } from "react-navigation";
-import Tasks from '../Screens/Tasks';
+import { createBottomTabNavigator } from "react-navigation-tabs";
+import { createMaterialBottomTabNavigator } from 'react-navigation-material-bottom-tabs';
+import { createDrawerNavigator } from 'react-navigation-drawer';
+import { FontAwesome, MaterialIcons } from '@expo/vector-icons';
+import TasksScreen from '../Screens/TasksScreen';
+import { HeaderButtons, Item } from 'react-navigation-header-buttons';
+import CustomHeaderButton from '../Components/CustomHeaderButton';
+import NewTaskScreen from '../Screens/NewTaskScreen';
+import Colors from '../Constants/Colors';
+import CompletedTasks from '../Screens/CompletedTasks';
+import FiltersScreen from '../Screens/FiltersScreen';
+import EmptyScreen from '../Screens/EmptyScreen';
 
-const stackNavigation = createStackNavigator({
+const defaultNavigationOptions = {
+    headerStyle: {
+        backgroundColor: Platform.OS === 'android' ? Colors.primary : Colors.white
+    },
+    headerTintColor: Platform.OS === 'android' ? Colors.white : Colors.primary
+}
+
+const stackNavigationHeaderLeft = (navData) => <HeaderButtons HeaderButtonComponent={CustomHeaderButton} >
+    <Item title="Menu" iconName="ios-menu" onPress={() => {
+        navData.navigation.toggleDrawer();
+    }} />
+</HeaderButtons>
+
+const TasksStackNavigation = createStackNavigator({
     Tasks: {
-        screen: Tasks
+        screen: TasksScreen,
+        navigationOptions: (navData) => ({
+            title: 'My Tasks',
+            headerRight: () => <HeaderButtons HeaderButtonComponent={CustomHeaderButton} >
+                <Item title="Add" iconComponent="Entypo" iconName="add-to-list" onPress={() => {
+                    navData.navigation.navigate('NewTask');
+                }} />
+            </HeaderButtons>,
+            headerLeft: () => stackNavigationHeaderLeft(navData)
+        }),
+    },
+    NewTask: {
+        screen: NewTaskScreen,
+        navigationOptions: (navData) => ({
+            title: 'Add Task',
+            headerRight: () => <HeaderButtons HeaderButtonComponent={CustomHeaderButton} >
+                <Item title="Save" iconComponent="Feather" iconName="save" onPress={() => {
+                    navData.navigation.navigate('Tasks');
+                }} />
+            </HeaderButtons>,
+            headerLeft: () => stackNavigationHeaderLeft(navData)
+        }),
     }
+}, {
+    defaultNavigationOptions
+}
+);
+
+const CompletedTasksStackNavigation = createStackNavigator({
+    CompletedTasks: {
+        screen: CompletedTasks,
+        navigationOptions: (navData) => ({
+            title: 'Tasks History',
+            headerRight: () => <HeaderButtons HeaderButtonComponent={CustomHeaderButton} >
+                <Item title="Add" iconComponent="Entypo" iconName="add-to-list" onPress={() => {
+                    navData.navigation.navigate('NewTask');
+                }} />
+            </HeaderButtons>,
+            headerLeft: () => stackNavigationHeaderLeft(navData)
+        })
+    }
+}, {
+    defaultNavigationOptions
 });
 
-export default createAppContainer(stackNavigation);
+const tabsNavigatorConfig = {
+    Tasks: {
+        screen: TasksStackNavigation,
+        navigationOptions: {
+            tabBarLabel: 'Tasks',
+            title: 'Tasks',
+            tabBarIcon: (tabInfo) => {
+                return <FontAwesome
+                    name="tasks"
+                    size={22}
+                    color={Colors.pDark} />
+            },
+            tabBarColor: Colors.sDark
+        }
+    },
+    CompletedTasks: {
+        screen: CompletedTasksStackNavigation,
+        navigationOptions: {
+            tabBarLabel: 'Completed Tasks',
+            tabBarIcon: (tabInfo) => {
+                return <MaterialIcons
+                    name="playlist-add-check"
+                    size={27}
+                    color={Colors.pDark} />
+            },
+
+            tabBarColor: Colors.pLight
+        }
+    }
+}
+
+const TabNavigator = Platform.OS === 'android'
+    ? createMaterialBottomTabNavigator(tabsNavigatorConfig, {
+        shifting: true,
+        barStyle: {
+            backgroundColor: Colors.pLight
+        }
+    })
+    : createBottomTabNavigator(tabsNavigatorConfig);
+
+    const FiltersStackNavigation = createStackNavigator({
+        Filters: {
+            screen: FiltersScreen,
+            navigationOptions: (navData) => ({
+                title: 'Filters',
+                headerRight: () => <HeaderButtons HeaderButtonComponent={CustomHeaderButton} >
+                    <Item title="Save" iconComponent="Feather" iconName="save" onPress={() => {
+                        const opener = navData.navigation.getParam('opener') || 'Tasks';
+                        navData.navigation.navigate(opener);
+                    }} />
+                </HeaderButtons>,
+                headerLeft: () => stackNavigationHeaderLeft(navData)
+            })
+        }
+    }, {
+        defaultNavigationOptions
+    });
+
+const MainNavigator = createDrawerNavigator({
+    Tasks: {
+        screen: TabNavigator,
+        navigationOptions: (navData) => {
+            return {
+                drawerLabel: 'Tasks',
+                title: 'Tasks'
+            }
+        }
+    },
+    Filters: {
+        screen: FiltersStackNavigation,
+    },
+    About: {
+        screen: EmptyScreen
+    },
+    LogOut: {
+        screen: EmptyScreen,
+    }
+}, {
+    contentOptions: {
+        activeTintColor: Colors.sDark,
+        inactiveTintColor: Colors.pLight
+    }
+})
+
+export default createAppContainer(MainNavigator);

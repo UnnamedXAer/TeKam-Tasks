@@ -6,7 +6,7 @@ export default class Task {
      * @param {string} description
      * @param {boolean} isCompleted
      * @param {ImportanceLevels} importance
-     * @param {Date} reminderAt
+     * @param {string | undefined} reminderAt
      * @memberof Task
      */
     constructor(
@@ -14,12 +14,14 @@ export default class Task {
         description,
         isCompleted,
         importance,
-        reminderAt
+        reminderAt,
     ) {
+        this.id = Math.random() + '_' + Math.random()
         this.title = title;
         this.description = description;
         this.isCompleted = isCompleted;
         this.importance = importance;
-        this.reminderAt = reminderAt;
+        this.reminderAt = reminderAt  && reminderAt.toISOString();
+        this.createDate = new Date().toISOString();
     }
 }

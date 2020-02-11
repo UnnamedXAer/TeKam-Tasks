@@ -1,57 +1,44 @@
 import React, { useState } from 'react';
-import { View, Text, StyleSheet, ScrollView, TextInput, Platform } from 'react-native';
+import { View, Text, StyleSheet, ScrollView, TextInput, Platform, Button } from 'react-native';
 import DatePicker from '@react-native-community/datetimepicker';
 import Header from '../Components/Header';
 import ImportanceLevel from '../Constants/ImportanceLevels';
 import Colors from '../Constants/Colors';
-import { Button } from 'react-native-paper';
 import moment from 'moment';
 import { MaterialCommunityIcons } from '@expo/vector-icons';
 import { TouchableOpacity, TouchableNativeFeedback } from 'react-native-gesture-handler';
+
+import DateTimePickerModal from 'react-native-modal-datetime-picker';
 
 const NewTaskScreen = (props) => {
     const TouchableComponent = Platform.OS === 'android' ? TouchableNativeFeedback : TouchableOpacity;
     const [title, setTitle] = useState('Building JavaScript bundle');
     const [description, setDescription] = useState('');
 
-    const [remindAt, setRemindAt] = useState(new Date());
-    const [isRemindAtSet, setIsRemindAtSet] = useState(false);
-    const [showDatePicker, setShowDatePicker] = useState(false);
-    const [dateTimeMode, setDateTimeMode] = useState('date');
+    const [isDatePickerVisible, setDatePickerVisibility] = useState(false);
+    const [remindDate, setRemindDate] = useState(new Date());
+    const [isRemindDateSet, setIsRemindDateSet] = useState(false);
 
     const [imporntance, setImporntance] = useState(ImportanceLevel.NORMAL);
 
-    const showDatePickerHandler = ev => {
-        setDateTimeMode('date');
-        setShowDatePicker(true);
-    }
-
-    const dateChangeHandler = (ev, selectedDate) => {
-        console.log(moment(selectedDate).format('dddd, DD MMM YYYY, HH:mm'));
-        if (!selectedDate) {
-            setShowDatePicker(false);
-            // nothing - picker will close
-        }
-        else {
-            setRemindAt(new Date(selectedDate || remindAt));
-
-            if (dateTimeMode === 'time') {
-                if (!isRemindAtSet) {
-                    setIsRemindAtSet(true);
-                }
-                setShowDatePicker(false);
-            }
-            else if (dateTimeMode === 'date') {
-                setDateTimeMode('time');
-            }
-        }
+    const showDatePickerHandler = () => {
+        setDatePickerVisibility(true);
     };
 
-    const cleanRemindAtHandler = ev => {
-        setIsRemindAtSet(false);
+    const cancelDatePickerHandler = () => {
+        setDatePickerVisibility(false);
     }
 
-    console.log('remindAt -> ', moment(remindAt).format('dddd, DD MMM YYYY, HH:mm'))
+    const confirmDatePickerHandler = date => {
+        console.log("A date has been picked: ", moment(remindDate).format('dddd, DD MMM YYYY, HH:mm'));
+        setDatePickerVisibility(false);
+        setIsRemindDateSet(true);
+        setRemindDate(date);
+    };
+
+    const clearRemindDateHandler = () => {
+        setIsRemindDateSet(false);
+    }
 
     return (
         <ScrollView style={styles.screen}>
@@ -84,14 +71,22 @@ const NewTaskScreen = (props) => {
                 autoCompleteType="off"
                 textAlignVertical="top"
             />
-            <View style={styles.remindAtWrapper}>
+
+            <View style={styles.remindDateWrapper}>
                 <Text style={styles.label}>Remind me at: </Text>
-                <View style={styles.remindAtButtonsWrapper}>
-                    <Button style={styles.remindAtButton}
+                <View style={styles.remindDateButtonsWrapper}>
+                    <TouchableComponent
                         onPress={showDatePickerHandler}>
-                        {isRemindAtSet ? moment(remindAt).format('dddd, DD MMM YYYY, HH:mm') : "Pick a time..."}
-                    </Button>
-                    {isRemindAtSet && <TouchableComponent onPress={cleanRemindAtHandler}>
+                        <View style={{ borderColor: 'red', borderWidth: 2 }}>
+                            <Text
+                                style={styles.remindDateButton}>
+                                {isRemindDateSet
+                                    ? moment(remindDate).format('dddd, DD MMM YYYY, HH:mm')
+                                    : 'Pick a time...'}
+                            </Text>
+                        </View>
+                    </TouchableComponent>
+                    {isRemindDateSet && <TouchableComponent onPress={clearRemindDateHandler}>
                         <MaterialCommunityIcons
                             name="eraser"
                             size={28}
@@ -101,14 +96,13 @@ const NewTaskScreen = (props) => {
                 </View>
             </View>
 
-            {showDatePicker && <DatePicker
-                display='default'
-                is24Hour={true}
-                minimumDate={new Date()}
-                mode={dateTimeMode}
-                value={remindAt}
-                onChange={dateChangeHandler}
-            />}
+            <DateTimePickerModal
+                date={remindDate}
+                isVisible={isDatePickerVisible}
+                mode="datetime"
+                onConfirm={confirmDatePickerHandler}
+                onCancel={cancelDatePickerHandler}
+            />
         </ScrollView>
     )
 }
@@ -128,18 +122,27 @@ const styles = StyleSheet.create({
         paddingVertical: 5,
         margin: 5
     },
-    remindAtWrapper: {
-        flexDirection: 'column'
+    remindDateWrapper: {
+        borderColor: 'purple', borderWidth: 2,
+        flexDirection: 'column',
     },
-    remindAtButtonsWrapper: {
+    remindDateButtonsWrapper: {
+        borderColor: 'blue', borderWidth: 2,
 
         flexDirection: 'row',
         justifyContent: 'center',
-        alignItems: 'baseline'
+        alignItems: 'baseline',
+
     },
-    remindAtButton: {
+    remindDateButton: {
         borderBottomColor: Colors.secondary,
-        borderWidth: 2
+        borderWidth: 2,
+        borderColor: 'yellow', borderWidth: 2,
+
+        borderTopWidth: 0,
+        borderLeftWidth: 0,
+        borderRightWidth: 0,
+        alignSelf: 'stretch'
     }
 })
 

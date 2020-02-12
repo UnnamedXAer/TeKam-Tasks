@@ -36,7 +36,7 @@ const NewTaskScreen = (props) => {
         setRemindDate(date);
     };
 
-    const clearRemindDateHandler = () => {
+    const clearRemindDateHandler = (ev) => {
         setIsRemindDateSet(false);
     }
 
@@ -71,29 +71,29 @@ const NewTaskScreen = (props) => {
                 autoCompleteType="off"
                 textAlignVertical="top"
             />
-
+            
             <View style={styles.remindDateWrapper}>
                 <Text style={styles.label}>Remind me at: </Text>
-                <View style={styles.remindDateButtonsWrapper}>
-                    <TouchableComponent
-                        onPress={showDatePickerHandler}>
-                        <View style={{ borderColor: 'red', borderWidth: 2 }}>
-                            <Text
-                                style={styles.remindDateButton}>
-                                {isRemindDateSet
-                                    ? moment(remindDate).format('dddd, DD MMM YYYY, HH:mm')
-                                    : 'Pick a time...'}
-                            </Text>
-                        </View>
-                    </TouchableComponent>
-                    {isRemindDateSet && <TouchableComponent onPress={clearRemindDateHandler}>
-                        <MaterialCommunityIcons
-                            name="eraser"
-                            size={28}
-                            color={Colors.primary}
-                        />
-                    </TouchableComponent>}
-                </View>
+                <TouchableComponent
+                    onPress={showDatePickerHandler}>
+                    <View style={styles.remindDateButtonsWrapper}>
+                        <Text
+                            style={styles.remindDateButtonText}>
+                            {isRemindDateSet
+                                ? moment(remindDate).format('dddd, DD MMM YYYY, HH:mm')
+                                : 'Pick a time...'}
+                        </Text>
+                        {isRemindDateSet && <View style={styles.clearButton}>
+                            <Button onPress={clearRemindDateHandler} title="ttt">
+                                <MaterialCommunityIcons
+                                    name="eraser"
+                                    size={28}
+                                    color={Colors.primary}
+                                />
+                            </Button>
+                        </View>}
+                    </View>
+                </TouchableComponent>
             </View>
 
             <DateTimePickerModal
@@ -123,26 +123,37 @@ const styles = StyleSheet.create({
         margin: 5
     },
     remindDateWrapper: {
-        borderColor: 'purple', borderWidth: 2,
         flexDirection: 'column',
     },
     remindDateButtonsWrapper: {
-        borderColor: 'blue', borderWidth: 2,
+
+        elevation: 3,
+        shadowColor: "#ccc",
+        shadowOffset: { width: 0, height: 4 },
+        shadowOpacity: 10,
+        shadowRadius: 10,
+        backgroundColor: 'white',
 
         flexDirection: 'row',
         justifyContent: 'center',
-        alignItems: 'baseline',
+        alignItems: 'center',
+        margin: 5
 
     },
-    remindDateButton: {
+    remindDateButtonText: {
+        fontSize: 18,
+        marginVertical: 16,
+        paddingHorizontal: 10,
         borderBottomColor: Colors.secondary,
         borderWidth: 2,
-        borderColor: 'yellow', borderWidth: 2,
-
+        borderColor: Colors.secondary,
+        borderWidth: 2,
         borderTopWidth: 0,
         borderLeftWidth: 0,
-        borderRightWidth: 0,
-        alignSelf: 'stretch'
+        borderRightWidth: 0
+    },
+    clearButton: {
+        marginHorizontal: 10, zIndex: 100
     }
 })
 

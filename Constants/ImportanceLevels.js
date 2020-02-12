@@ -1,5 +1,5 @@
 const ImportanceLevel = {
-    IMPORTANT: 'Iimportant',
+    IMPORTANT: 'Important',
     NORMAL: 'Normal',
     NOT_IMPORTANT: 'Not Important'
 };

@@ -1,16 +1,18 @@
 import React from 'react';
 import { View, Text, StyleSheet } from 'react-native';
-import { TouchableOpacity, TouchableNativeFeedback } from 'react-native-gesture-handler';
+import { TouchableOpacity, TouchableNativeFeedback, TouchableWithoutFeedback } from 'react-native-gesture-handler';
 import Colors from '../Constants/Colors';
 
-const Button = ({ onPress, children }) => {
-    const TouchableComponent = Platform.OS === 'android' ? TouchableNativeFeedback : TouchableOpacity;
+const Button = ({ onPress, children, disabled }) => {
+    const TouchableComponent = disabled 
+    ? TouchableWithoutFeedback 
+    : Platform.OS === 'android' ? TouchableNativeFeedback : TouchableOpacity;
     return (
-        <TouchableComponent onPress={onPress}>
-            <View style={styles.button}>
-            <Text style={styles.text}>{children}</Text>
-        </View>
-            </TouchableComponent>
+        <TouchableComponent onPress={onPress} >
+            <View style={{ ...styles.button, ...(disabled ? styles.disabled : {}) }}>
+                <Text style={{ ...styles.text, ...(disabled ? styles.disabledText : {}) }}>{children}</Text>
+            </View>
+        </TouchableComponent>
     );
 };
 
@@ -27,6 +29,12 @@ const styles = StyleSheet.create({
         fontSize: 18,
         fontWeight: 'bold',
         textAlign: 'center'
+    },
+    disabled: {
+        backgroundColor: 'rgba(0, 0, 0, 0.15)',
+    },
+    disabledText: {
+        color: 'rgba(0, 0, 0, 0.5)'
     }
 })
 

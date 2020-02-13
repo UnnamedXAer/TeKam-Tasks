@@ -1,25 +1,36 @@
-import React, { useState } from 'react';
-import { View, Text, StyleSheet, ScrollView, TextInput, Platform, Picker, Dimensions } from 'react-native';
-import ImportanceLevel from '../Constants/ImportanceLevels';
-import Colors from '../Constants/Colors';
-import moment from 'moment';
+import React, { useState, useRef } from 'react';
+import { View, Text, StyleSheet, ScrollView, TextInput, Platform, Picker, Dimensions, ToastAndroid, } from 'react-native';
 import { MaterialCommunityIcons } from '@expo/vector-icons';
 import { TouchableOpacity, TouchableNativeFeedback } from 'react-native-gesture-handler';
 import DateTimePickerModal from 'react-native-modal-datetime-picker';
+import Toast from 'react-native-simple-toast';
+import moment from 'moment';
+import Button from '../Components/Button';
+import Colors from '../Constants/Colors';
+import ImportanceLevel from '../Constants/ImportanceLevels';
+import Task from '../Models/Task';
 
 const screenWidth = Dimensions.get('screen').width;
 
 
 const NewTaskScreen = (props) => {
     const TouchableComponent = Platform.OS === 'android' ? TouchableNativeFeedback : TouchableOpacity;
-    const [title, setTitle] = useState('Building JavaScript bundle');
+    const [title, setTitle] = useState('');
     const [description, setDescription] = useState('');
-
     const [isDatePickerVisible, setDatePickerVisibility] = useState(false);
     const [remindDate, setRemindDate] = useState(new Date());
     const [isRemindDateSet, setIsRemindDateSet] = useState(false);
-
     const [imporntance, setImporntance] = useState(ImportanceLevel.NORMAL);
+    const [titleTouched, setTitleTouched] = useState(false);
+    const titleRef = useRef(null);
+    const descriptionRef = useRef(null);
+
+    const titleChangeHandler = (value) => {
+        if (!titleTouched) {
+            setTitleTouched(true);
+        }
+        setTitle(value);
+    }
 
     const showDatePickerHandler = () => {
         setDatePickerVisibility(true);
@@ -30,7 +41,6 @@ const NewTaskScreen = (props) => {
     };
 
     const confirmDatePickerHandler = date => {
-        console.log("A date has been picked: ", moment(remindDate).format('dddd, DD MMM YYYY, HH:mm'));
         setDatePickerVisibility(false);
         setIsRemindDateSet(true);
         setRemindDate(date);
@@ -40,6 +50,34 @@ const NewTaskScreen = (props) => {
         setIsRemindDateSet(false);
     };
 
+
+    const isTitleFilled = () => title.trim().length > 0;
+
+    const submitHandler = ev => {
+        if (!isTitleFilled()) {
+            if (!titleTouched) {
+                setTitleTouched(true);
+            }
+            titleRef.current.focus();
+            return Toast.showWithGravity('Please, fill at least title.', ToastAndroid.SHORT, ToastAndroid.CENTER);
+        }
+
+        const newTask = new Task(
+            title.trim(),
+            description.trim(),
+            false,
+            imporntance,
+            remindDate
+        )
+        props.navigation.navigate({
+            routeName: 'Tasks',
+            params: {
+                newTask
+            }
+        });
+    }
+
+    const titleOk = isTitleFilled();
     return (
         <ScrollView
             style={styles.screen}
@@ -47,17 +85,22 @@ const NewTaskScreen = (props) => {
             <View>
                 <Text style={styles.label}>Activity title</Text>
                 <TextInput
-                    style={styles.input}
+                    style={{
+                        ...styles.input,
+                        ...((!titleOk && titleTouched) ? { borderBottomColor: Colors.danger } : {})
+                    }}
+                    ref={titleRef}
                     placeholder="Activity in few words..."
-                    numberOfLines={2}
+                    numberOfLines={1}
                     maxLength={50}
                     value={title}
                     nativeID="title"
-                    onChangeText={setTitle}
+                    onChangeText={titleChangeHandler}
                     autoCompleteType="off"
                     autoFocus={true}
                     importantForAutofill="no"
                     returnKeyType="next"
+                    onSubmitEditing={ev => descriptionRef.current.focus()}
                 />
                 <Text style={styles.inputInfo}>{title.length}/50 characters</Text>
             </View>
@@ -65,6 +108,7 @@ const NewTaskScreen = (props) => {
                 <Text style={styles.label}>Activity description</Text>
                 <TextInput
                     style={styles.input}
+                    ref={descriptionRef}
                     placeholder="Put some details here..."
                     multiline={true}
                     numberOfLines={3}
@@ -76,17 +120,24 @@ const NewTaskScreen = (props) => {
                     onChangeText={setDescription}
                     autoCompleteType="off"
                     textAlignVertical="top"
+                    returnKeyType="default"
                 />
                 <Text style={styles.inputInfo}>{description.length}/500 characters</Text>
             </View>
             <View>
-                <View style={styles.input}>
+                <Text style={styles.label}>Importance</Text>
+                <View style={styles.pickerWrapper}>
                     <Picker
                         prompt="Importance"
                         selectedValue={imporntance}
                         mode='dialog'
                         onValueChange={(itemValue, _) => setImporntance(itemValue)}>
-                        {Object.keys(ImportanceLevel).map(x => <Picker.Item key={x} label={ImportanceLevel[x]} value={x} />)}
+                        {Object.keys(ImportanceLevel).map(x => (
+                            <Picker.Item
+                                key={x}
+                                label={ImportanceLevel[x]}
+                                value={x} />)
+                        )}
                     </Picker>
                 </View>
                 <Text style={styles.inputInfo}>Select a level of importance</Text>
@@ -126,6 +177,13 @@ const NewTaskScreen = (props) => {
                     onCancel={cancelDatePickerHandler}
                 />
             </View>
+            <View style={styles.saveButtonWrapper}>
+                <Button
+                    disabled={!titleOk}
+                    onPress={submitHandler}>
+                    Save
+                </Button>
+            </View>
         </ScrollView >
     );
 };
@@ -133,7 +191,7 @@ const NewTaskScreen = (props) => {
 const styles = StyleSheet.create({
     screen: {
         flex: 1,
-        paddingHorizontal: screenWidth < 300 ? 5 : screenWidth < 600 ? 15 : 30
+        paddingHorizontal: screenWidth < 300 ? 5 : screenWidth < 600 ? 15 : 30,
     },
     label: {
         marginTop: 10,
@@ -154,7 +212,14 @@ const styles = StyleSheet.create({
         paddingTop: 5,
         margin: 5
     },
-
+    pickerWrapper: {
+        borderColor: Colors.secondary,
+        borderWidth: 0,
+        borderBottomWidth: 2,
+        paddingHorizontal: 5,
+        marginHorizontal: 5,
+        marginBottom: 5
+    },
     remindDateWrapper: {
         flexDirection: 'column',
     },
@@ -179,6 +244,11 @@ const styles = StyleSheet.create({
         padding: 10,
         marginHorizontal: 6,
         justifyContent: 'center',
+    },
+    saveButtonWrapper: {
+        marginTop: 30,
+        justifyContent: 'flex-end',
+        marginBottom: 30
     }
 });
 

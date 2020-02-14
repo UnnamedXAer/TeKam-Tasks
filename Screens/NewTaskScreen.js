@@ -30,7 +30,7 @@ const NewTaskScreen = (props) => {
             setTitleTouched(true);
         }
         setTitle(value);
-    }
+    };
 
     const showDatePickerHandler = () => {
         setDatePickerVisibility(true);

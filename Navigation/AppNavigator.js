@@ -50,7 +50,6 @@ const TasksStackNavigation = createStackNavigator({
                     navData.navigation.navigate('Tasks');
                 }} />
             </HeaderButtons>,
-            headerLeft: () => stackNavigationHeaderLeft(navData)
         }),
     }
 }, {
@@ -126,7 +125,6 @@ const TabNavigator = Platform.OS === 'android'
                         navData.navigation.navigate(opener);
                     }} />
                 </HeaderButtons>,
-                headerLeft: () => stackNavigationHeaderLeft(navData)
             })
         }
     }, {
@@ -143,14 +141,22 @@ const MainNavigator = createDrawerNavigator({
             }
         }
     },
+    NewTask: {
+        screen: NewTaskScreen,
+        navigationOptions: {
+            title: 'Add Task',
+            drawerLabel: 'Add Task'
+        }
+    },
     Filters: {
         screen: FiltersStackNavigation,
+        navigationOptions: {
+            title: 'Filters/Sort Options',
+            drawerLabel: 'Filters/Sort Options'
+        }
     },
     About: {
         screen: EmptyScreen
-    },
-    LogOut: {
-        screen: EmptyScreen,
     }
 }, {
     contentOptions: {

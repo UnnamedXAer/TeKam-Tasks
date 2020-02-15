@@ -18,7 +18,7 @@ const Button = ({ onPress, children, disabled }) => {
 
 const styles = StyleSheet.create({
     button: {
-        flex: 1,
+        // flex: 1,
         paddingHorizontal: 10,
         paddingVertical: 10,
         backgroundColor: Colors.secondary,

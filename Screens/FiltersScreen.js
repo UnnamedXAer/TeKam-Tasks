@@ -9,20 +9,20 @@ import Card from '../Components/Card';
 const screenWidth = Dimensions.get('screen').width;
 
 
-const Filter = ({ label, value, onValueChange }) => {
-    return (
-        <View style={styles.filter}>
-            <Text style={styles.label}>{label}</Text>
-            <Switch style={{
-                scaleX: 1.4,
-                scaleY: 1.4,
-            }}
-                trackColor={Colors.sDark}
-                thumbColor={Colors.sLight}
-                value={value} onValueChange={onValueChange} />
-        </View>
-    )
-};
+// const Filter = ({ label, value, onValueChange }) => {
+//     return (
+//         <View style={styles.filter}>
+//             <Text style={styles.label}>{label}</Text>
+//             <Switch style={{
+//                 scaleX: 1.4,
+//                 scaleY: 1.4,
+//             }}
+//                 trackColor={Colors.sDark}
+//                 thumbColor={Colors.sLight}
+//                 value={value} onValueChange={onValueChange} />
+//         </View>
+//     )
+// };
 
 const FiltersScreen = (props) => {
 
@@ -69,12 +69,9 @@ const FiltersScreen = (props) => {
                 </View>
             </Card>
 
-
+{/* 
             <Card>
 
-                <Filter label="Importance" />
-                <Filter label="Importance" />
-                <Filter label="Importance" />
                 <Filter label="Importance" />
 
                 <View>
@@ -87,7 +84,7 @@ const FiltersScreen = (props) => {
                         </View>
                     </TouchableRipple>
                 </View>
-            </Card>
+            </Card> */}
         </ScrollView>
     );
 };

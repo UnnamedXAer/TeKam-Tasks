@@ -1,5 +1,5 @@
 import React, { useState, useRef } from 'react';
-import { View, Text, StyleSheet, ScrollView, TextInput, Platform, Picker, Dimensions, ToastAndroid, } from 'react-native';
+import { View, Text, StyleSheet, ScrollView, TextInput, Platform, Picker, Dimensions } from 'react-native';
 import { MaterialCommunityIcons } from '@expo/vector-icons';
 import { TouchableOpacity, TouchableNativeFeedback } from 'react-native-gesture-handler';
 import DateTimePickerModal from 'react-native-modal-datetime-picker';
@@ -9,6 +9,7 @@ import Button from '../Components/Button';
 import Colors from '../Constants/Colors';
 import ImportanceLevel from '../Constants/ImportanceLevels';
 import Task from '../Models/Task';
+
 
 const screenWidth = Dimensions.get('screen').width;
 
@@ -59,7 +60,7 @@ const NewTaskScreen = (props) => {
                 setTitleTouched(true);
             }
             titleRef.current.focus();
-            return Toast.showWithGravity('Please, fill at least title.', ToastAndroid.SHORT, ToastAndroid.CENTER);
+            return Toast.showWithGravity('Please, fill at least title.', Toast.SHORT, Toast.CENTER);
         }
 
         const newTask = new Task(

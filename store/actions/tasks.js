@@ -89,8 +89,6 @@ export const refreshTasks = () => {
             dispatch(refreshTasksSuccess(data || {}));
         }
         catch (err) {
-            console.log('err', err);
-            console.log(JSON.stringify(err, null, '\t'));
             const message = err.response ? err.response.data.error : err.message
             dispatch(refreshTasksFail(message));
         }
@@ -124,12 +122,9 @@ export const saveNewTask = (task) => {
         try {
             const { data } = await axios.post('/tasks.json', task);
             task = {...task, id: data.name};
-            console.log(data.name);
             dispatch(saveNewTaskSuccess(task));
         }
         catch (err) {
-            console.log('err', err);
-            console.log(JSON.stringify(err, null, '\t'));
             const message = err.response ? err.response.data.error : err.message
             dispatch(saveNewTaskFail(message));
         }

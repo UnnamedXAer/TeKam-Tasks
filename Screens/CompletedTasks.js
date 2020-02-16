@@ -8,7 +8,7 @@ import { useDispatch, useSelector } from 'react-redux';
 import * as actions from '../store/actions';
 
 const CompletedTasksScreen = () => {
-    const tasks = useSelector(state => state.tasks.pending);
+    const tasks = useSelector(state => state.tasks.completed);
     const loading = useSelector(state => state.tasks.loading);
     const error = useSelector(state => state.tasks.error);
     const refreshing = useSelector(state => state.tasks.refreshing);

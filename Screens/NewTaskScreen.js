@@ -1,5 +1,5 @@
-import React, { useState, useRef } from 'react';
-import { View, Text, StyleSheet, ScrollView, TextInput, Platform, Picker, Dimensions } from 'react-native';
+import React, { useState, useRef, useEffect } from 'react';
+import { View, Text, StyleSheet, ScrollView, TextInput, Platform, Picker, Dimensions, Alert } from 'react-native';
 import { MaterialCommunityIcons } from '@expo/vector-icons';
 import { TouchableOpacity, TouchableNativeFeedback } from 'react-native-gesture-handler';
 import DateTimePickerModal from 'react-native-modal-datetime-picker';
@@ -9,6 +9,8 @@ import Button from '../Components/Button';
 import Colors from '../Constants/Colors';
 import ImportanceLevel from '../Constants/ImportanceLevels';
 import Task from '../Models/Task';
+import { useDispatch, useSelector } from 'react-redux';
+import * as actions from '../store/actions';
 
 
 const screenWidth = Dimensions.get('screen').width;
@@ -16,6 +18,7 @@ const screenWidth = Dimensions.get('screen').width;
 
 const NewTaskScreen = (props) => {
     const TouchableComponent = Platform.OS === 'android' ? TouchableNativeFeedback : TouchableOpacity;
+
     const [title, setTitle] = useState('');
     const [description, setDescription] = useState('');
     const [isDatePickerVisible, setDatePickerVisibility] = useState(false);
@@ -23,8 +26,50 @@ const NewTaskScreen = (props) => {
     const [isRemindDateSet, setIsRemindDateSet] = useState(false);
     const [imporntance, setImporntance] = useState(ImportanceLevel.NORMAL);
     const [titleTouched, setTitleTouched] = useState(false);
+
     const titleRef = useRef(null);
     const descriptionRef = useRef(null);
+
+    const loading = useSelector(state => state.tasks.newTaskLoading);
+    const error = useSelector(state => state.tasks.newTaskError);
+    const redirect = useSelector(state => state.tasks.newTaskRedirect);
+
+    const dispatch = useDispatch();
+
+    useEffect(() => {
+        if (redirect) {
+            props.navigation.navigate('Tasks');
+            dispatch(actions.setRedirectFromNewTaskScreen(false));
+        }
+    }, [redirect])
+
+    useEffect(() => {
+        if (error) {
+            Alert.alert(
+                'Alert Title',
+                'My Alert Msg',
+                [
+                    {
+                        text: 'Ask me later',
+                        onPress: () => console.log('Ask me later pressed')
+                    },
+                    {
+                        text: 'Cancel',
+                        onPress: () => console.log('Cancel Pressed'),
+                        style: 'cancel',
+                    },
+                    {
+                        text: 'OK',
+                        onPress: () => console.log('OK Pressed')
+                    },
+                ],
+                { cancelable: false },
+            );
+        }
+        return () => {
+
+        };
+    }, [error])
 
     const titleChangeHandler = (value) => {
         if (!titleTouched) {
@@ -70,12 +115,7 @@ const NewTaskScreen = (props) => {
             imporntance,
             remindDate
         )
-        props.navigation.navigate({
-            routeName: 'Tasks',
-            params: {
-                newTask
-            }
-        });
+        dispatch(actions.saveNewTask(newTask));
     }
 
     const titleOk = isTitleFilled();
@@ -83,6 +123,12 @@ const NewTaskScreen = (props) => {
         <ScrollView
             style={styles.screen}
         >
+            <View style={{
+                backgroundColor: '#ccc', minHeight: 50, minWidth: 100, marginVertical: 10
+            }}>
+                {error && <Text>{error}</Text>}
+                {loading && <Text>loading</Text>}
+            </View>
             <View>
                 <Text style={styles.label}>Activity title</Text>
                 <TextInput

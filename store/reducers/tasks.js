@@ -9,7 +9,11 @@ const initialState = {
     activeFilters: {},
     sortOptions: {},
     tasksLoading: {},
-    tasksErrors: {}
+    tasksErrors: {},
+
+    newTaskLoading: false,
+    newTaskError: null,
+    newTaskRedirect: false
 };
 
 const fetchTasksStart = (state, action) => {
@@ -105,7 +109,6 @@ const toggleCompleteFail = (state, action) => {
 };
 
 const refreshTasksStart = (state, action) => {
-    console.log('refreshTasksStart')
     return {
         ...state,
         loading: false,
@@ -114,16 +117,53 @@ const refreshTasksStart = (state, action) => {
 };
 
 const refreshTasksSuccess = (state, action) => {
-    console.log('refreshTasksSuccess')
-
     return fetchTasksSuccess(state, action);
 };
 
 const refreshTasksFail = (state, action) => {
-    console.log('refreshTasksFail')
-    
     return fetchTasksFail(state, action);
 }
+
+const saveNewTaskStart = (state, action) => {
+    return {
+        ...state,
+        newTaskLoading: true,
+        newTaskError: null,
+        newTaskRedirect: false
+    };
+};
+
+const saveNewTaskSuccess = (state, action) => {
+    const { task } = action;
+    const updatedPendingTasks = state.pending.concat(task);
+    return {
+        ...state,
+        newTaskLoading: false,
+        newTaskError: null,
+        newTaskRedirect: true,
+        pending: updatedPendingTasks,
+
+        loading: false,
+        error: null,
+        refreshing: false
+    };
+};
+
+const saveNewTaskFail = (state, action) => {
+    return {
+        ...state,
+        newTaskLoading: false,
+        newTaskError: action.error,
+        newTaskRedirect: false
+    };
+};
+
+const setRedirectFromNewTaskScreen = (state, action) => {
+    return {
+        ...state,
+        newTaskRedirect: action.redirect
+    };
+};
 
 const reducer = (state = initialState, action) => {
     switch (action.type) {
@@ -138,6 +178,12 @@ const reducer = (state = initialState, action) => {
         case actionTypes.REFRESH_TASKS_START: return refreshTasksStart(state, action);
         case actionTypes.REFRESH_TASKS_SUCCESS: return refreshTasksSuccess(state, action);
         case actionTypes.REFRESH_TASKS_FAIL: return refreshTasksFail(state, action);
+
+        case actionTypes.SAVE_NEW_TASK_START: return saveNewTaskStart(state, action);
+        case actionTypes.SAVE_NEW_TASK_SUCCESS: return saveNewTaskSuccess(state, action);
+        case actionTypes.SAVE_NEW_TASK_FAIL: return saveNewTaskFail(state, action);
+
+        case actionTypes.SET_REDIRECT_FROM_NEW_TASK_SCREEN: return setRedirectFromNewTaskScreen(state, action);
         default:
             return state;
     };

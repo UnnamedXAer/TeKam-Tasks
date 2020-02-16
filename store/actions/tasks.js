@@ -116,3 +116,49 @@ const refreshTasksFail = (error) => {
         error
     };
 };
+
+export const saveNewTask = (task) => {
+    return async dispatch => {
+        dispatch(saveNewTaskStart());
+
+        try {
+            const { data } = await axios.post('/tasks.json', task);
+            task = {...task, id: data.name};
+            console.log(data.name);
+            dispatch(saveNewTaskSuccess(task));
+        }
+        catch (err) {
+            console.log('err', err);
+            console.log(JSON.stringify(err, null, '\t'));
+            const message = err.response ? err.response.data.error : err.message
+            dispatch(saveNewTaskFail(message));
+        }
+    };
+};
+
+const saveNewTaskStart = () => {
+    return {
+        type: actionTypes.SAVE_NEW_TASK_START
+    };
+};
+
+const saveNewTaskSuccess = (task) => {
+    return {
+        type: actionTypes.SAVE_NEW_TASK_SUCCESS,
+        task
+    };
+};
+
+const saveNewTaskFail = (error) => {
+    return {
+        type: actionTypes.SAVE_NEW_TASK_FAIL,
+        error
+    };
+};
+
+export const setRedirectFromNewTaskScreen = (redirect) => {
+    return {
+        type: actionTypes.SET_REDIRECT_FROM_NEW_TASK_SCREEN,
+        redirect
+    };
+};

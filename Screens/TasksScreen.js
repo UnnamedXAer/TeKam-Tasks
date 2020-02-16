@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { View, StyleSheet, FlatList, Text, ActivityIndicator, Dimensions } from 'react-native';
+import { View, StyleSheet, FlatList, Text, ActivityIndicator, Dimensions, RefreshControl } from 'react-native';
 import TaskListItem from '../Components/TaskListItem';
 import Colors from '../Constants/Colors';
 import axios from '../axios/axios';
@@ -11,10 +11,10 @@ const TasksScreen = (props) => {
     const [tasks, setTasks] = useState([]);
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState(null);
+    const [refreshing, setRefreshing] = useState(false);
 
     useEffect(() => {
         let didCancel = false;
-
         async function getTasks() {
             setLoading(true);
             try {
@@ -24,7 +24,7 @@ const TasksScreen = (props) => {
                     const fetchedTasks = [];
                     dbIds.forEach(id => {
                         if (!data[id].isCompleted) {
-                            fetchedTasks.push({...data[id], id });
+                            fetchedTasks.push({ ...data[id], id });
                         }
                     });
                     setTasks(fetchedTasks);
@@ -41,7 +41,6 @@ const TasksScreen = (props) => {
             if (!didCancel) {
                 setLoading(false);
             }
-
         }
         getTasks();
 
@@ -49,15 +48,13 @@ const TasksScreen = (props) => {
     }, []);
 
     const completeTaskHandler = async idx => {
-        
-
         try {
             const url = `/tasks/${tasks[idx].id}.json`;
             const { data } = await axios.patch(url, {
                 isCompleted: true,
                 completedAt: new Date().toISOString()
             });
-            
+
             setTasks(prevState => {
                 const updatedState = [...prevState];
                 updatedState.splice(idx, 1);
@@ -67,8 +64,29 @@ const TasksScreen = (props) => {
         catch (err) {
             alert('Sorry, could not mark task as completed.\nPlease, refresh and try again.');
         }
-
     };
+
+    const refreshHandler = async ev => {
+        setRefreshing(true);
+        try {
+            const { data } = await axios.get('/tasks.json');
+            const dbIds = Object.keys(data);
+            const fetchedTasks = [];
+            dbIds.forEach(id => {
+                if (!data[id].isCompleted) {
+                    fetchedTasks.push({ ...data[id], id });
+                }
+            });
+            setTasks(fetchedTasks);
+
+        }
+        catch (err) {
+            console.log(JSON.stringify(err, null, '\t'));
+            const message = err.response ? err.response.data.error : err.message
+            setError(message);
+        }
+        setRefreshing(false);
+    }
 
     if (loading) {
         return <View style={[styles.screen, styles.positionInfo]}>
@@ -91,6 +109,13 @@ const TasksScreen = (props) => {
                 ? <>
                     <Text style={styles.numOfTasksText}>You have {tasks.length} planned things to do.</Text>
                     <FlatList
+                        refreshing={refreshing}
+                        refreshControl={<RefreshControl
+                            title="refreshing..."
+                            refreshing={refreshing}
+                            onRefresh={refreshHandler}
+                            colors={[Colors.secondary, Colors.sLight, Colors.secondary, Colors.sDark]}
+                            size="large" />}
                         style={styles.tasksList}
                         data={tasks}
                         keyExtractor={(item, _) => item.id}

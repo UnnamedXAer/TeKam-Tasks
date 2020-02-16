@@ -4,8 +4,8 @@ export default {
     pDark: '#260e04',
     // secondary: '#ffd600',
     secondary: '#ffcd00',
-    sLight: '#ffff52',
-    sDark: '#c7a500',
+    sLight: '#ffe600',
+    sDark: '#d4af00',
     danger: '#e54304',
     white: 'white'
 }

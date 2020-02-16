@@ -6,135 +6,79 @@ import axios from '../axios/axios';
 import Header from '../Components/Header';
 import Card from '../Components/Card';
 import Button from '../Components/Button';
+import { useSelector, useDispatch } from 'react-redux';
+import * as actions from '../store/actions/tasks';
 
 const TasksScreen = (props) => {
-    const [tasks, setTasks] = useState([]);
-    const [loading, setLoading] = useState(true);
-    const [error, setError] = useState(null);
-    const [refreshing, setRefreshing] = useState(false);
+    const tasks = useSelector(state => state.tasks.pending);
+    const loading = useSelector(state => state.tasks.loading);
+    const error = useSelector(state => state.tasks.error);
+    const refreshing = useSelector(state => state.tasks.refreshing);
+    const dispatch = useDispatch();
 
     useEffect(() => {
-        let didCancel = false;
-        async function getTasks() {
-            setLoading(true);
-            try {
-                const { data } = await axios.get('/tasks.json');
-                if (!didCancel) {
-                    const dbIds = Object.keys(data);
-                    const fetchedTasks = [];
-                    dbIds.forEach(id => {
-                        if (!data[id].isCompleted) {
-                            fetchedTasks.push({ ...data[id], id });
-                        }
-                    });
-                    setTasks(fetchedTasks);
-                }
-            }
-            catch (err) {
-                console.log('err', err);
-                console.log(JSON.stringify(err, null, '\t'));
-                if (!didCancel) {
-                    const message = err.response ? err.response.data.error : err.message
-                    setError(message);
-                }
-            }
-            if (!didCancel) {
-                setLoading(false);
-            }
-        }
-        getTasks();
-
-        return () => { didCancel = true };
+        dispatch(actions.fetchTasks());
     }, []);
 
-    const completeTaskHandler = async idx => {
-        try {
-            const url = `/tasks/${tasks[idx].id}.json`;
-            const { data } = await axios.patch(url, {
-                isCompleted: true,
-                completedAt: new Date().toISOString()
-            });
-
-            setTasks(prevState => {
-                const updatedState = [...prevState];
-                updatedState.splice(idx, 1);
-                return updatedState;
-            });
-        }
-        catch (err) {
-            alert('Sorry, could not mark task as completed.\nPlease, refresh and try again.');
-        }
+    const completeTaskHandler = async id => {
+        dispatch(actions.toggleComplete(id));
     };
 
     const refreshHandler = async ev => {
-        setRefreshing(true);
-        try {
-            const { data } = await axios.get('/tasks.json');
-            const dbIds = Object.keys(data);
-            const fetchedTasks = [];
-            dbIds.forEach(id => {
-                if (!data[id].isCompleted) {
-                    fetchedTasks.push({ ...data[id], id });
-                }
-            });
-            setTasks(fetchedTasks);
-
-        }
-        catch (err) {
-            console.log(JSON.stringify(err, null, '\t'));
-            const message = err.response ? err.response.data.error : err.message
-            setError(message);
-        }
-        setRefreshing(false);
+        dispatch(actions.refreshTasks());
     }
 
     if (loading) {
         return <View style={[styles.screen, styles.positionInfo]}>
             <ActivityIndicator color={Colors.secondary} size="large" style={{ scaleX: 1.5, scaleY: 1.5 }} />
-        </View>
+        </View>;
     }
+
+    let floatedInfo;
+
     if (error) {
-        return <View style={[styles.screen, styles.positionInfo]}>
+        floatedInfo = <View style={[styles.screen, styles.floatedInfoPanel]}>
             <Card>
                 <Header>Opss, somethig went wrong. 😵😱😵</Header>
                 <View><Text>{error}</Text></View>
             </Card>
-        </View>
+        </View>;
+    }
+    else if (tasks.length === 0) {
+        floatedInfo = <View style={styles.floatedInfoPanel}>
+            <Text style={styles.noTasksInfoText}>There are no pending tasks.</Text>
+            <Button onPress={() => props.navigation.navigate({ routeName: 'NewTask' })}>ADD NEW TASK.</Button>
+        </View>;
     }
 
     return (
         <View style={[styles.screen, (!loading ? styles.positionInfo : {})]}>
-
-            {tasks.length > 0
-                ? <>
-                    <Text style={styles.numOfTasksText}>You have {tasks.length} planned things to do.</Text>
-                    <FlatList
+            <>
+                {floatedInfo}
+                <Text style={styles.numOfTasksText}>You have {tasks.length} planned things to do.</Text>
+                <FlatList
+                    refreshing={refreshing}
+                    refreshControl={<RefreshControl
+                        title="refreshing..."
                         refreshing={refreshing}
-                        refreshControl={<RefreshControl
-                            title="refreshing..."
-                            refreshing={refreshing}
-                            onRefresh={refreshHandler}
-                            colors={[Colors.secondary, Colors.sLight, Colors.secondary, Colors.sDark]}
-                            size="large" />}
-                        style={styles.tasksList}
-                        data={tasks}
-                        keyExtractor={(item, _) => item.id}
-                        renderItem={itemData => (
-                            <TaskListItem
-                                task={itemData.item}
-                                onTaskComplete={() => completeTaskHandler(itemData.index)}
-                            />
-                        )}
-                    />
-                </>
-                : <View style={styles.noTasksInfo}>
-                    <Text style={styles.noTasksInfoText}>There are no pending tasks.</Text>
-                    <Button onPress={() => props.navigation.navigate({ routeName: 'NewTask' })}>ADD NEW TASK.</Button>
-                </View>
-            }
+                        onRefresh={refreshHandler}
+                        colors={[Colors.secondary, Colors.sLight, Colors.secondary, Colors.sDark]}
+                        size="large" />}
+                    style={styles.tasksList}
+                    data={tasks}
+                    keyExtractor={(item, _) => item.id}
+                    renderItem={itemData => (
+                        <TaskListItem
+                            task={itemData.item}
+                            onTaskComplete={() => completeTaskHandler(itemData.item.id)}
+                        />
+                    )}
+                />
+            </>
+
         </View>
-    )
-}
+    );
+};
 
 const styles = StyleSheet.create({
     screen: {
@@ -151,13 +95,16 @@ const styles = StyleSheet.create({
         justifyContent: 'center',
         alignItems: 'center',
     },
-    noTasksInfo: {
+    floatedInfoPanel: {
+        margin: 5,
         flexDirection: 'column',
         justifyContent: 'center',
         alignItems: 'center',
         paddingVertical: 25,
         paddingHorizontal: 20,
-        backgroundColor: Colors.primary
+        backgroundColor: Colors.primary,
+        top: 80,
+        position: 'absolute'
     },
     noTasksInfoText: {
         fontSize: 22,

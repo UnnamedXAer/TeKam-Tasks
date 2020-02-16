@@ -1,141 +1,81 @@
-import React, { useState, useEffect } from 'react';
+import React, { useEffect } from 'react';
 import { View, StyleSheet, FlatList, Text, RefreshControl, Dimensions, ActivityIndicator } from 'react-native';
 import TaskListItem from '../Components/TaskListItem';
 import Card from '../Components/Card';
 import Header from '../Components/Header';
 import Colors from '../Constants/Colors';
-import axios from '../axios/axios';
+import { useDispatch, useSelector } from 'react-redux';
+import * as actions from '../store/actions';
 
-const CompletedTasksScreen = (props) => {
-    const [tasks, setTasks] = useState([]);
-    const [uncompletedTasks, setUncompletedTasks] = useState([]);
-    const [loading, setLoading] = useState(true);
-    const [error, setError] = useState(null);
-    const [refreshing, setRefreshing] = useState(false);
+const CompletedTasksScreen = () => {
+    const tasks = useSelector(state => state.tasks.pending);
+    const loading = useSelector(state => state.tasks.loading);
+    const error = useSelector(state => state.tasks.error);
+    const refreshing = useSelector(state => state.tasks.refreshing);
+    const dispatch = useDispatch();
 
     useEffect(() => {
-        let didCancel = false;
-        console.log('useEffect')
-        async function getTasks() {
-            setLoading(true);
-            try {
-                const { data } = await axios.get('/tasks.json');
-                if (!didCancel) {
-                    const dbIds = Object.keys(data);
-                    const fetchedTasks = [];
-                    dbIds.forEach(id => {
-                        if (data[id].isCompleted) {
-                            fetchedTasks.push({ ...data[id], id });
-                        }
-                    });
-                    setTasks(fetchedTasks);
-                }
-            }
-            catch (err) {
-                console.log('err', err);
-                console.log(JSON.stringify(err, null, '\t'));
-                if (!didCancel) {
-                    const message = err.response ? err.response.data.error : err.message
-                    setError(message);
-                }
-            }
-            if (!didCancel) {
-                setLoading(false);
-            }
-        }
-        getTasks();
-
-        return () => { didCancel = true };
+        dispatch(actions.fetchTasks());
     }, []);
 
-    const uncompleteTaskHandler = async idx => {
-        
-        const task = {...tasks[idx], isCompleted: false, completedAt: null};
-
-        try {
-            const url = `/tasks/${tasks[idx].id}.json`;
-            const { data } = await axios.patch(url, {
-                isCompleted: false,
-                completedAt: null
-            });
-
-            setUncompletedTasks(prevState => prevState.concat(task));
-            setTasks(prevState => {
-                const updatedState = prevState.filter(x => x.id !== task.id);
-                return updatedState;
-            });
-        }
-        catch (err) {
-            alert('Sorry, could not mark task as uncompleted.\nPlease, refresh and try again.');
-        }
+    const uncompleteTaskHandler = async id => {
+        dispatch(actions.toggleComplete(id));
     };
 
     const refreshHandler = async ev => {
-        setRefreshing(true);
-        try {
-            const { data } = await axios.get('/tasks.json');
-            const dbIds = Object.keys(data);
-            const fetchedTasks = [];
-            dbIds.forEach(id => {
-                if (data[id].isCompleted) {
-                    fetchedTasks.push({ ...data[id], id });
-                }
-            });
-            setTasks(fetchedTasks);
-
-        }
-        catch (err) {
-            console.log(JSON.stringify(err, null, '\t'));
-            const message = err.response ? err.response.data.error : err.message
-            setError(message);
-        }
-        setRefreshing(false);
-    }
+        dispatch(actions.refreshTasks());
+    };
 
     if (loading) {
         return <View style={[styles.screen, styles.positionInfo]}>
             <ActivityIndicator color={Colors.secondary} size="large" style={{ scaleX: 1.5, scaleY: 1.5 }} />
-        </View>
+        </View>;
     }
+
+    let floatedInfo;
+
     if (error) {
-        return <View style={[styles.screen, styles.positionInfo]}>
+        floatedInfo = <View style={[styles.screen, styles.floatedInfoPanel]}>
             <Card>
                 <Header>Opss, somethig went wrong. 😵😱😵</Header>
                 <View><Text>{error}</Text></View>
             </Card>
-        </View>
+        </View>;
+    }
+    else if (tasks.length === 0) {
+        floatedInfo = <View style={styles.floatedInfoPanel}>
+            <Text style={styles.noTasksInfoText}>There are no completed tasks yet.</Text>
+        </View>;
     }
 
     return (
-        <View style={styles.screen}>
-            {tasks.length > 0
-                ? <FlatList
-                    style={styles.tasksList}
+        <View style={[styles.screen, (!loading ? styles.positionInfo : {})]}>
+            <>
+                {floatedInfo}
+                <Text style={styles.numOfTasksText}>You have {tasks.length} completed tasks.</Text>
+                <FlatList
                     refreshing={refreshing}
-                        refreshControl={<RefreshControl
-                            title="refreshing..."
-                            refreshing={refreshing}
-                            onRefresh={refreshHandler}
-                            colors={[Colors.secondary, Colors.sLight, Colors.secondary, Colors.sDark]}
-                            size="large" />}
-                        style={styles.tasksList}
+                    refreshControl={<RefreshControl
+                        title="refreshing..."
+                        refreshing={refreshing}
+                        onRefresh={refreshHandler}
+                        colors={[Colors.secondary, Colors.sLight, Colors.secondary, Colors.sDark]}
+                        size="large" />}
+                    style={styles.tasksList}
                     data={tasks}
                     keyExtractor={(item, _) => item.id}
                     renderItem={itemData => (
                         <TaskListItem
                             task={itemData.item}
-                            onTaskComplete={() => uncompleteTaskHandler(itemData.index)}
+                            onTaskComplete={() => uncompleteTaskHandler(itemData.item.id)}
                         />
                     )}
                 />
-                : <View style={styles.noTasksInfoWrapper}>
-                    <View style={styles.noTasksInfo}>
-                        <Text style={styles.noTasksInfoText}>There are no completed tasks yet.</Text>
-                    </View>
-                </View>}
+            </>
+
         </View>
-    )
-}
+    );
+};
 
 const styles = StyleSheet.create({
     screen: {
@@ -152,13 +92,16 @@ const styles = StyleSheet.create({
         justifyContent: 'center',
         alignItems: 'center',
     },
-    noTasksInfo: {
+    floatedInfoPanel: {
+        margin: 5,
         flexDirection: 'column',
         justifyContent: 'center',
         alignItems: 'center',
         paddingVertical: 25,
         paddingHorizontal: 20,
-        backgroundColor: Colors.primary
+        backgroundColor: Colors.primary,
+        top: 80,
+        position: 'absolute'
     },
     noTasksInfoText: {
         fontSize: 22,

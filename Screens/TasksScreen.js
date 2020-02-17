@@ -1,8 +1,15 @@
-import React, { useState, useEffect } from 'react';
-import { View, StyleSheet, FlatList, Text, ActivityIndicator, Dimensions, RefreshControl } from 'react-native';
+import React, { useEffect } from 'react';
+import {
+    View,
+    StyleSheet,
+    FlatList,
+    Text,
+    ActivityIndicator,
+    Dimensions,
+    RefreshControl
+} from 'react-native';
 import TaskListItem from '../Components/TaskListItem';
 import Colors from '../Constants/Colors';
-import axios from '../axios/axios';
 import Header from '../Components/Header';
 import Card from '../Components/Card';
 import Button from '../Components/Button';
@@ -14,6 +21,8 @@ const TasksScreen = (props) => {
     const loading = useSelector(state => state.tasks.loading);
     const error = useSelector(state => state.tasks.error);
     const refreshing = useSelector(state => state.tasks.refreshing);
+    const tasksLoading = useSelector(state => state.tasks.tasksLoading);
+    const tasksErrors = useSelector(state => state.tasks.tasksErrors);
     const dispatch = useDispatch();
 
     useEffect(() => {
@@ -21,16 +30,19 @@ const TasksScreen = (props) => {
     }, []);
 
     const completeTaskHandler = async id => {
-        dispatch(actions.toggleComplete(id));
+        dispatch(actions.toggleComplete(id, true));
     };
 
     const refreshHandler = async ev => {
         dispatch(actions.refreshTasks());
-    }
+    };
 
     if (loading) {
         return <View style={[styles.screen, styles.positionInfo]}>
-            <ActivityIndicator color={Colors.secondary} size="large" style={{ scaleX: 1.5, scaleY: 1.5 }} />
+            <ActivityIndicator
+                color={Colors.secondary}
+                size="large"
+                style={{ scaleX: 1.5, scaleY: 1.5 }} />
         </View>;
     }
 
@@ -47,7 +59,10 @@ const TasksScreen = (props) => {
     else if (tasks.length === 0) {
         floatedInfo = <View style={styles.floatedInfoPanel}>
             <Text style={styles.noTasksInfoText}>There are no pending tasks.</Text>
-            <Button onPress={() => props.navigation.navigate({ routeName: 'NewTask' })}>ADD NEW TASK.</Button>
+            <Button
+                onPress={() => props.navigation.navigate({ routeName: 'NewTask' })}>
+                ADD NEW TASK.
+            </Button>
         </View>;
     }
 
@@ -55,7 +70,9 @@ const TasksScreen = (props) => {
         <View style={[styles.screen, (!loading ? styles.positionInfo : {})]}>
             <>
                 {floatedInfo}
-                <Text style={styles.numOfTasksText}>You have {tasks.length} planned things to do.</Text>
+                <Text style={styles.numOfTasksText}>
+                    You have {tasks.length} planned things to do.
+                </Text>
                 <FlatList
                     refreshing={refreshing}
                     refreshControl={<RefreshControl
@@ -69,6 +86,8 @@ const TasksScreen = (props) => {
                     keyExtractor={(item, _) => item.id}
                     renderItem={itemData => (
                         <TaskListItem
+                            error={tasksErrors[itemData.item.id]}
+                            isLoading={!!tasksLoading[itemData.item.id]}
                             task={itemData.item}
                             onTaskComplete={() => completeTaskHandler(itemData.item.id)}
                         />

@@ -6,6 +6,11 @@ const initialState = {
     loading: true,
     error: null,
     refreshing: false,
+
+    compleatedLoading: true,
+    compleatedError: null,
+    compleatedRefreshing: false,
+
     activeFilters: {},
     sortOptions: {},
     tasksLoading: {},
@@ -17,6 +22,16 @@ const initialState = {
 };
 
 const fetchTasksStart = (state, action) => {
+
+    if (action.forCompleted) {
+        return {
+            ...state,
+            compleatedLoading: true,
+            compleatedError: null,
+            compleatedRefreshing: false
+        };
+    }
+
     return {
         ...state,
         loading: true,
@@ -26,33 +41,54 @@ const fetchTasksStart = (state, action) => {
 };
 
 const fetchTasksSuccess = (state, action) => {
-    const { tasks } = action;
+    const { tasks, forCompleted } = action;
 
     const dbIds = Object.keys(tasks);
-    const completedTasks = [];
-    const pendingTasks = [];
+    const updatedTasks = [];
+    const updatedTasksErrors = {...state.tasksErrors};
     dbIds.forEach(id => {
-        if (tasks[id].isCompleted) {
-            completedTasks.push({ ...tasks[id], id });
+        if (updatedTasksErrors[id]) {
+            updatedTasksErrors[id] = false;
         }
-        else {
-            pendingTasks.push({ ...tasks[id], id });
-        }
+        updatedTasks.push({ ...tasks[id], id });
     });
+
+    if (forCompleted) {
+        return {
+            ...state,
+            completed: updatedTasks,
+            compleatedLoading: false,
+            compleatedError: null,
+            compleatedRefreshing: false,
+            tasksErrors: updatedTasksErrors
+        };
+    }
 
     return {
         ...state,
-        pending: pendingTasks,
-        completed: completedTasks,
+        pending: updatedTasks,
         loading: false,
         error: null,
-        refreshing: false
+        refreshing: false,
+        tasksErrors: updatedTasksErrors
     };
 };
 
 const fetchTasksFail = (state, action) => {
+
+    if (action.forCompleted) {
+        return {
+            ...state,
+            completed: [],
+            compleatedLoading: false,
+            compleatedError: action.error,
+            compleatedRefreshing: false
+        };
+    }
+
     return {
         ...state,
+        pending: [],
         loading: false,
         error: action.error,
         refreshing: false
@@ -69,26 +105,35 @@ const toggleCompleteStart = (state, action) => {
 };
 
 const toggleCompleteSuccess = (state, action) => {
-    const { id } = action;
+    const { id, markAsCompleted, completeDate } = action;
     let updatedCompletedTasks = [];
     let updatedPendingTasks = [];
-    state.completed.forEach(task => {
-        if (task.id === id) {
-            updatedPendingTasks.push(task);
-        }
-        else {
-            updatedCompletedTasks.push(task);
-        }
-    });
 
-    state.pending.forEach(task => {
-        if (task.id === id) {
-            updatedCompletedTasks.push(task);
+    if (markAsCompleted) { // was pending will be completed 
+        const task = state.pending.find(x => x.id === id);
+        if (!task) {
+            debugger;
         }
         else {
-            updatedPendingTasks.push(task);
+            task.isCompleted = markAsCompleted;
+            task.completedAt = completeDate;
+            updatedPendingTasks = state.pending.filter(x => x.id !== id);
+            updatedCompletedTasks = state.completed.concat(task);
         }
-    });
+
+    }
+    else {
+        const task = state.completed.find(x => x.id === id);
+        if (!task) {
+            debugger;
+        }
+        else {
+            task.isCompleted = markAsCompleted; 
+            task.completedAt = completeDate;
+            updatedCompletedTasks = state.completed.filter(x => x.id !== id);
+            updatedPendingTasks = state.pending.concat(task);
+        }
+    }
 
     return {
         ...state,
@@ -109,6 +154,14 @@ const toggleCompleteFail = (state, action) => {
 };
 
 const refreshTasksStart = (state, action) => {
+    if (action.forCompleted) {
+        return {
+            ...state,
+            compleatedLoading: false,
+            compleatedRefreshing: true
+        };
+    }
+
     return {
         ...state,
         loading: false,

@@ -1,5 +1,13 @@
 import React, { useEffect } from 'react';
-import { View, StyleSheet, FlatList, Text, RefreshControl, Dimensions, ActivityIndicator } from 'react-native';
+import { 
+    View, 
+    StyleSheet, 
+    FlatList, 
+    Text, 
+    RefreshControl, 
+    Dimensions, 
+    ActivityIndicator 
+} from 'react-native';
 import TaskListItem from '../Components/TaskListItem';
 import Card from '../Components/Card';
 import Header from '../Components/Header';
@@ -9,26 +17,36 @@ import * as actions from '../store/actions';
 
 const CompletedTasksScreen = () => {
     const tasks = useSelector(state => state.tasks.completed);
-    const loading = useSelector(state => state.tasks.loading);
-    const error = useSelector(state => state.tasks.error);
-    const refreshing = useSelector(state => state.tasks.refreshing);
+    const loading = useSelector(state => state.tasks.compleatedLoading);
+    const error = useSelector(state => state.tasks.compleatedError);
+    const refreshing = useSelector(state => state.tasks.compleatedRefreshing);
+    const tasksLoading = useSelector(state => state.tasks.tasksLoading);
+    const tasksErrors = useSelector(state => state.tasks.tasksErrors);
     const dispatch = useDispatch();
 
     useEffect(() => {
-        dispatch(actions.fetchTasks());
+        dispatch(actions.fetchTasks(true));
     }, []);
 
-    const uncompleteTaskHandler = async id => {
-        dispatch(actions.toggleComplete(id));
+    const uncompleteTaskHandler = id => {
+        dispatch(actions.toggleComplete(id, false));
     };
 
-    const refreshHandler = async ev => {
-        dispatch(actions.refreshTasks());
+    const refreshHandler = ev => {
+        dispatch(actions.refreshTasks(true));
     };
+
+    const deleteTaskHandler = id => {
+        console.log('I\'m deleting. ', id);
+        // dispatch something
+    }
 
     if (loading) {
         return <View style={[styles.screen, styles.positionInfo]}>
-            <ActivityIndicator color={Colors.secondary} size="large" style={{ scaleX: 1.5, scaleY: 1.5 }} />
+            <ActivityIndicator 
+                color={Colors.secondary} 
+                size="large" 
+                style={{ scaleX: 1.5, scaleY: 1.5 }} />
         </View>;
     }
 
@@ -52,7 +70,9 @@ const CompletedTasksScreen = () => {
         <View style={[styles.screen, (!loading ? styles.positionInfo : {})]}>
             <>
                 {floatedInfo}
-                <Text style={styles.numOfTasksText}>You have {tasks.length} completed tasks.</Text>
+                <Text style={styles.numOfTasksText}>
+                    You have {tasks.length} completed tasks.
+                </Text>
                 <FlatList
                     refreshing={refreshing}
                     refreshControl={<RefreshControl
@@ -64,10 +84,13 @@ const CompletedTasksScreen = () => {
                     style={styles.tasksList}
                     data={tasks}
                     keyExtractor={(item, _) => item.id}
-                    renderItem={itemData => (
+                    renderItem={({item}) => (
                         <TaskListItem
-                            task={itemData.item}
-                            onTaskComplete={() => uncompleteTaskHandler(itemData.item.id)}
+                            isLoading={!!tasksLoading[item.id]}
+                            error={tasksErrors[item.id]}
+                            task={item}
+                            onTaskComplete={() => uncompleteTaskHandler(item.id)}
+                            onTaskDelete={() => deleteTaskHandler(item.id)}
                         />
                     )}
                 />

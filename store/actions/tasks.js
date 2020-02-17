@@ -1,60 +1,69 @@
 import axios from '../../axios/axios';
 import * as actionTypes from './actionTypes';
 
-export const fetchTasks = () => {
+export const fetchTasks = (forCompleted = false) => {
     return async dispatch => {
-        dispatch(fetchTasksStart());
+        dispatch(fetchTasksStart(forCompleted));
 
+        const url = `/tasks.json?orderBy="isCompleted"&equalTo=${forCompleted}`;
         try {
-            const { data } = await axios.get('/tasks.json');
-            throw new Error('error 123')
-            dispatch(fetchTasksSuccess(data || {}));
+            const { data } = await axios.get(url);
+            if (typeof data !== 'object') {
+                throw new Error('Wrong response type.');
+            }
+            dispatch(fetchTasksSuccess(data || {}, forCompleted));
         }
         catch (err) {
             const message = err.response ? err.response.data.error : err.message
-            dispatch(fetchTasksFail(message));
+            dispatch(fetchTasksFail(message, forCompleted));
         }
     };
 };
 
-const fetchTasksStart = () => {
+const fetchTasksStart = (forCompleted) => {
     return {
-        type: actionTypes.FETCH_TASKS_START
+        type: actionTypes.FETCH_TASKS_START,
+        forCompleted
     };
 };
 
-const fetchTasksSuccess = (tasks) => {
+const fetchTasksSuccess = (tasks, forCompleted) => {
     return {
         type: actionTypes.FETCH_TASKS_SUCCESS,
-        tasks
+        tasks,
+        forCompleted
     };
 };
 
-const fetchTasksFail = (error) => {
+const fetchTasksFail = (error, forCompleted) => {
     return {
         type: actionTypes.FETCH_TASKS_FAIL,
-        error
+        error,
+        forCompleted
     };
 };
 
-export const toggleComplete = (id) => {
+export const toggleComplete = (id, markAsCompleted) => {
     return async dispatch => {
         dispatch(toggleCompleteStart(id));
-        try {
-            const url = `/tasks/${id}.json`;
-            const { data } = await axios.patch(url, {
-                isCompleted: true,
-                completedAt: new Date().toISOString()
-            });
-
-            dispatch(toggleCompleteSuccess(id));
-        }
-        catch (err) {
-            const message = err.response ? err.response.data.error : err.message
-            // const message = 'Sorry, could not mark task as completed.\nPlease, refresh and try again.';
-            alert(message);
-            dispatch(toggleCompleteFail(message, id));
-        }
+        const url = `/tasks/${id}.json`;
+        const completeDate = markAsCompleted ? new Date().toISOString() : null;
+        setTimeout(async () => {
+            try {
+                const { data } = await axios.patch(url, {
+                    isCompleted: markAsCompleted,
+                    completedAt: completeDate
+                });
+                
+                dispatch(toggleCompleteSuccess(id, markAsCompleted, completeDate));
+            }
+            catch (err) {
+                // const message = err.response ? err.response.data.error : err.message
+                const message = `Sorry, could not mark task as ${markAsCompleted ? 'completed' : 'pending'}.\nPlease, refresh and try again.`;
+                alert(message);
+                dispatch(toggleCompleteFail(message, id, markAsCompleted));
+            }
+        }, 233);
     }
 };
 
@@ -65,53 +74,62 @@ const toggleCompleteStart = (id) => {
     };
 };
 
-const toggleCompleteSuccess = (id) => {
+const toggleCompleteSuccess = (id, markAsCompleted, completeDate) => {
     return {
         type: actionTypes.TOGGLE_COMPLETE_SUCCESS,
-        id
+        id,
+        markAsCompleted,
+        completeDate
     };
 };
 
-const toggleCompleteFail = (error, id) => {
+const toggleCompleteFail = (error, id, markAsCompleted) => {
     return {
-        type: actionTypes.TOGGLE_COMPLETE_START,
+        type: actionTypes.TOGGLE_COMPLETE_FAIL,
         error,
-        id
+        id, 
+        markAsCompleted
     };
 };
 
-export const refreshTasks = () => {
+export const refreshTasks = (forCompleted = false) => {
     return async dispatch => {
-        dispatch(refreshTasksStart());
-
+        dispatch(refreshTasksStart(forCompleted));
+        const url = `/tasks.json?orderBy="isCompleted"&equalTo=${forCompleted}`;
         try {
-            const { data } = await axios.get('/tasks.json');
-            dispatch(refreshTasksSuccess(data || {}));
+            const { data } = await axios.get(url);
+            if (typeof data !== 'object') {
+                throw new Error('Wrong response type.');
+            }
+            dispatch(refreshTasksSuccess(data || {}, forCompleted));
         }
         catch (err) {
             const message = err.response ? err.response.data.error : err.message
-            dispatch(refreshTasksFail(message));
+            dispatch(refreshTasksFail(message, forCompleted));
         }
     };
 };
 
-const refreshTasksStart = () => {
+const refreshTasksStart = (forCompleted) => {
     return {
-        type: actionTypes.REFRESH_TASKS_START
+        type: actionTypes.REFRESH_TASKS_START,
+        forCompleted
     };
 };
 
-const refreshTasksSuccess = (tasks) => {
+const refreshTasksSuccess = (tasks, forCompleted) => {
     return {
         type: actionTypes.REFRESH_TASKS_SUCCESS,
-        tasks
+        tasks,
+        forCompleted
     };
 };
 
-const refreshTasksFail = (error) => {
+const refreshTasksFail = (error, forCompleted) => {
     return {
         type: actionTypes.REFRESH_TASKS_FAIL,
-        error
+        error,
+        forCompleted
     };
 };
 

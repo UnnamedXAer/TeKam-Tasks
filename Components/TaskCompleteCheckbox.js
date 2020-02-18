@@ -1,7 +1,7 @@
 import React from 'react';
 import { TouchableOpacity, TouchableNativeFeedback } from 'react-native-gesture-handler';
 import { Feather } from '@expo/vector-icons';
-import { View, StyleSheet, Platform, ActivityIndicator } from 'react-native';
+import { View, Text, StyleSheet, Platform, ActivityIndicator } from 'react-native';
 import Colors from '../Constants/Colors';
 
 const TaskCompleteCheckbox = ({ isLoading, isCompleted, onTaskComplete }) => {

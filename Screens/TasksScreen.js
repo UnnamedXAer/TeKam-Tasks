@@ -1,4 +1,4 @@
-import React, { useEffect } from 'react';
+import React, { useEffect, useState } from 'react';
 import {
     View,
     StyleSheet,
@@ -14,9 +14,13 @@ import Header from '../Components/Header';
 import Card from '../Components/Card';
 import Button from '../Components/Button';
 import { useSelector, useDispatch } from 'react-redux';
-import * as actions from '../store/actions/tasks';
+import Menu from '../Components/Menu';
+import * as actions from '../store/actions';
 
 const TasksScreen = (props) => {
+    const [taskMenuPosition, setTaskMenuPosition] = useState(null);
+    const [taskMenuTaskId, setTaskMenuTaskId] = useState(null);
+
     const tasks = useSelector(state => state.tasks.pending);
     const loading = useSelector(state => state.tasks.loading);
     const error = useSelector(state => state.tasks.error);
@@ -36,6 +40,45 @@ const TasksScreen = (props) => {
     const refreshHandler = async ev => {
         dispatch(actions.refreshTasks());
     };
+
+    const openTaskMenuHandler = (pos, taskId) => {
+        setTaskMenuPosition(pos);
+        setTaskMenuTaskId(taskId);
+    };
+
+    const clearTaskMenuValues = () => {
+        setTaskMenuPosition(null);
+        setTaskMenuTaskId(null);
+    };
+
+    const taskMenuOptions = [
+
+        {
+            label: 'Delete', onPress: () => {
+                console.log('I\'m deleting');
+
+            }
+        },
+        {
+            label: 'Complete', onPress: () => {
+                console.log('I\'m completing');
+                console.log('taskId:', taskMenuTaskId);
+                if (taskMenuTaskId) {
+                    // actions.toggleComplete(taskMenuTaskId)
+                }
+                else {
+                    alert('taskMenuTaskId: ' + taskMenuTaskId);
+                }
+                clearTaskMenuValues();
+            }
+        },
+        {
+            label: 'Share', onPress: () => {
+                console.log('I\'m sharing');
+            }
+        }
+    ];
+
 
     if (loading) {
         return <View style={[styles.screen, styles.positionInfo]}>
@@ -84,17 +127,18 @@ const TasksScreen = (props) => {
                     style={styles.tasksList}
                     data={tasks}
                     keyExtractor={(item, _) => item.id}
-                    renderItem={itemData => (
+                    renderItem={({ item }) => (
                         <TaskListItem
-                            error={tasksErrors[itemData.item.id]}
-                            isLoading={!!tasksLoading[itemData.item.id]}
-                            task={itemData.item}
-                            onTaskComplete={() => completeTaskHandler(itemData.item.id)}
+                            openMenu={openTaskMenuHandler}
+                            error={tasksErrors[item.id]}
+                            isLoading={!!tasksLoading[item.id]}
+                            task={item}
+                            onTaskComplete={() => completeTaskHandler(item.id)}
                         />
                     )}
                 />
             </>
-
+            {taskMenuPosition && <Menu options={taskMenuOptions} position={taskMenuPosition} />}
         </View>
     );
 };

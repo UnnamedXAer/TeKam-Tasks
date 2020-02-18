@@ -1,5 +1,6 @@
 import React from 'react';
 import { View, Text, StyleSheet, } from 'react-native';
+import { TouchableOpacity, TouchableNativeFeedback } from 'react-native-gesture-handler';
 import Card from './Card';
 import Colors from '../Constants/Colors';
 import { dateToLocalString } from '../Utils/time';
@@ -7,15 +8,16 @@ import ImportanceLevel from '../Constants/ImportanceLevels';
 import TaskError from './TaskError';
 import TaskCompleteCheckbox from './TaskCompleteCheckbox';
 import TaskMenu from './TaskMenu';
+import Menu from './Menu';
 
-const TaskListItem = ({ task, onTaskComplete, onTaskDelete, isLoading, error }) => {
+const TaskListItem = ({ task, onTaskComplete, onTaskDelete, isLoading, error, openMenu }) => {
 
     return (
         <Card>
             <View style={styles.task}>
                 <TaskError error={error} />
                 <View style={styles.titleWrapper}>
-                <TaskMenu onDelete={onTaskDelete} isEnabled={!isLoading} />
+                <TaskMenu onDelete={onTaskDelete} isEnabled={!isLoading} openMenu={openMenu} taskId={task.id} />
                     <Text style={styles.title} numberOfLines={2}>{task.title}</Text>
                     <TaskCompleteCheckbox onTaskComplete={onTaskComplete} isLoading={isLoading} isCompleted={task.isCompleted} />
                 </View>
@@ -51,7 +53,9 @@ const TaskListItem = ({ task, onTaskComplete, onTaskDelete, isLoading, error }) 
 const styles = StyleSheet.create({
     task: {
         flex: 1,
-        padding: 10
+        padding: 10,
+        position: 'relative',
+        overflow: 'visible'
     },
     titleWrapper: {
         flexDirection: 'row',
@@ -60,7 +64,9 @@ const styles = StyleSheet.create({
         borderBottomColor: Colors.sDark,
         borderBottomWidth: 1,
         marginHorizontal: 5,
-        marginVertical: 8
+        marginVertical: 8,
+        position: 'relative',
+        overflow: 'visible'
     },
     title: {
         maxWidth: '90%',

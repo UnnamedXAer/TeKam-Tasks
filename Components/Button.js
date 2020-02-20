@@ -1,16 +1,18 @@
 import React from 'react';
-import { View, Text, StyleSheet } from 'react-native';
+import { View, Text, StyleSheet, ActivityIndicator } from 'react-native';
 import { TouchableOpacity, TouchableNativeFeedback, TouchableWithoutFeedback } from 'react-native-gesture-handler';
 import Colors from '../Constants/Colors';
 
-const Button = ({ onPress, children, disabled }) => {
+const Button = ({ onPress, children, disabled, loading }) => {
     const TouchableComponent = disabled 
     ? TouchableWithoutFeedback 
     : Platform.OS === 'android' ? TouchableNativeFeedback : TouchableOpacity;
     return (
-        <TouchableComponent onPress={onPress} >
+        <TouchableComponent onPress={onPress} disabled={loading} >
             <View style={{ ...styles.button, ...(disabled ? styles.disabled : {}) }}>
-                <Text style={{ ...styles.text, ...(disabled ? styles.disabledText : {}) }}>{children}</Text>
+                {loading
+                ? <ActivityIndicator color={Colors.primary} size="small" />
+                : <Text style={{ ...styles.text, ...(disabled ? styles.disabledText : {}) }}>{children}</Text>}
             </View>
         </TouchableComponent>
     );
@@ -18,17 +20,17 @@ const Button = ({ onPress, children, disabled }) => {
 
 const styles = StyleSheet.create({
     button: {
-        // flex: 1,
+        height: 45,
         paddingHorizontal: 10,
         paddingVertical: 10,
         backgroundColor: Colors.secondary,
-        alignItems: 'center'
+        alignItems: 'center',
+        justifyContent: 'center'
     },
     text: {
         color: Colors.primary,
         fontSize: 18,
         fontWeight: 'bold',
-        textAlign: 'center'
     },
     disabled: {
         backgroundColor: 'rgba(0, 0, 0, 0.15)',

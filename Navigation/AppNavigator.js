@@ -50,11 +50,11 @@ const TasksStackNavigation = createStackNavigator({
         navigationOptions: (navData) => {
             return {
                 title: 'Add Task',
-                headerRight: () => <HeaderButtons HeaderButtonComponent={CustomHeaderButton} >
-                    <Item title="Save" iconComponent="Feather" iconName="save" onPress={() => {
-                        navData.navigation.navigate('Tasks');
-                    }} />
-                </HeaderButtons>,
+                // headerRight: () => <HeaderButtons HeaderButtonComponent={CustomHeaderButton} >
+                //     <Item title="Save" iconComponent="Feather" iconName="save" onPress={() => {
+                //         navData.navigation.navigate('Tasks');
+                //     }} />
+                // </HeaderButtons>,
             };
         },
     }

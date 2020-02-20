@@ -1,6 +1,6 @@
 import React, { useState, useRef, useEffect } from 'react';
-import { View, Text, StyleSheet, ScrollView, TextInput, Platform, Picker, Dimensions, Alert } from 'react-native';
-import { MaterialCommunityIcons } from '@expo/vector-icons';
+import { View, Text, StyleSheet, ScrollView, TextInput, Platform, Picker, Dimensions, Alert, ActivityIndicator } from 'react-native';
+import { MaterialCommunityIcons, Entypo } from '@expo/vector-icons';
 import { TouchableOpacity, TouchableNativeFeedback } from 'react-native-gesture-handler';
 import DateTimePickerModal from 'react-native-modal-datetime-picker';
 import Toast from 'react-native-simple-toast';
@@ -21,11 +21,17 @@ const NewTaskScreen = (props) => {
 
     const [title, setTitle] = useState('');
     const [description, setDescription] = useState('');
-    const [isDatePickerVisible, setDatePickerVisibility] = useState(false);
-    const [remindDate, setRemindDate] = useState(new Date());
-    const [isRemindDateSet, setIsRemindDateSet] = useState(false);
     const [imporntance, setImporntance] = useState(ImportanceLevel.NORMAL);
     const [titleTouched, setTitleTouched] = useState(false);
+    const [descriptionVisible, setDescriptionVisible] = useState(false);
+
+    const [isRemindDatePickerVisible, setIsRemindDatePickerVisible] = useState(false);
+    const [remindDate, setRemindDate] = useState(new Date());
+    const [isRemindDateSet, setIsRemindDateSet] = useState(false);
+
+    const [isTaskDatePickerVisible, setIsTaskDatePickerVisible] = useState(false);
+    const [taskDate, setTaskDate] = useState(new Date());
+    const [isTaskDateSet, setIsTaskDateSet] = useState(false);
 
     const titleRef = useRef(null);
     const descriptionRef = useRef(null);
@@ -78,22 +84,45 @@ const NewTaskScreen = (props) => {
         setTitle(value);
     };
 
-    const showDatePickerHandler = () => {
-        setDatePickerVisibility(true);
+    const showDatePickerHandler = (relatedVar) => {
+        if (relatedVar === 'task') {
+            setIsTaskDatePickerVisible(true);
+        }
+        else {
+            setIsRemindDatePickerVisible(true);
+        }
     };
 
-    const cancelDatePickerHandler = () => {
-        setDatePickerVisibility(false);
+    const cancelDatePickerHandler = (relatedVar) => {
+        if (relatedVar === 'task') {
+            setIsTaskDatePickerVisible(false);
+        }
+        else {
+            setIsRemindDatePickerVisible(false);
+        }
     };
 
-    const confirmDatePickerHandler = date => {
-        setDatePickerVisibility(false);
-        setIsRemindDateSet(true);
-        setRemindDate(date);
+    const confirmDatePickerHandler = (date, relatedVar) => {
+        if (relatedVar === 'task') {
+            setIsTaskDatePickerVisible(false);
+            setIsTaskDateSet(true);
+            setTaskDate(date);
+        }
+        else {
+            setIsRemindDatePickerVisible(false);
+            setIsRemindDateSet(true);
+            setRemindDate(date);
+        }
+
     };
 
-    const clearRemindDateHandler = (ev) => {
-        setIsRemindDateSet(false);
+    const clearDateHandler = (relatedVar) => {
+        if (relatedVar === 'task') {
+            setIsTaskDateSet(false);
+        }
+        else {
+            setIsRemindDateSet(false);
+        }
     };
 
 
@@ -113,9 +142,13 @@ const NewTaskScreen = (props) => {
             description.trim(),
             false,
             imporntance,
-            remindDate
+            isRemindDateSet ? remindDate : void 0
         )
         dispatch(actions.saveNewTask(newTask));
+    };
+
+    const toggleDescriptionHandler = () => {
+        setDescriptionVisible(prevState => !prevState);
     }
 
     const titleOk = isTitleFilled();
@@ -123,13 +156,10 @@ const NewTaskScreen = (props) => {
         <ScrollView
             style={styles.screen}
         >
-            <View style={{
-                backgroundColor: '#ccc', minHeight: 50, minWidth: 100, marginVertical: 10
-            }}>
+            <View style={styles.error}>
                 {error && <Text>{error}</Text>}
-                {loading && <Text>loading</Text>}
             </View>
-            <View>
+            <View style={styles.inputWrapper}>
                 <Text style={styles.label}>Activity title</Text>
                 <TextInput
                     style={{
@@ -144,90 +174,143 @@ const NewTaskScreen = (props) => {
                     nativeID="title"
                     onChangeText={titleChangeHandler}
                     autoCompleteType="off"
-                    autoFocus={true}
+                    // autoFocus={true}
                     importantForAutofill="no"
                     returnKeyType="next"
                     onSubmitEditing={ev => descriptionRef.current.focus()}
                 />
                 <Text style={styles.inputInfo}>{title.length}/50 characters</Text>
             </View>
-            <View>
-                <Text style={styles.label}>Activity description</Text>
-                <TextInput
-                    style={styles.input}
-                    ref={descriptionRef}
-                    placeholder="Put some details here..."
-                    multiline={true}
-                    numberOfLines={3}
-                    maxFontSizeMultiplier={1}
-                    maxLength={500}
-                    value={description}
-                    nativeID="description"
-                    caretHidden={false}
-                    onChangeText={setDescription}
-                    autoCompleteType="off"
-                    textAlignVertical="top"
-                    returnKeyType="default"
-                />
-                <Text style={styles.inputInfo}>{description.length}/500 characters</Text>
+            <View style={{
+                borderColor: Colors.secondary,
+                borderWidth: 0,
+                borderBottomWidth: descriptionVisible ? 0 : 2,
+                paddingBottom: descriptionVisible ? 0 : 5
+            }}>
+                <TouchableComponent onPress={toggleDescriptionHandler} style={styles.descriptionTitle}>
+                    <Entypo name={descriptionVisible ? 'chevron-small-up' : 'chevron-small-down'} size={22} style={styles.expandChevron} />
+                    <Text style={styles.label}>Activity description</Text>
+                </TouchableComponent>
+                {descriptionVisible && <View style={styles.inputWrapper}>
+                    <TextInput
+                        style={styles.input}
+                        ref={descriptionRef}
+                        placeholder="Put some details here..."
+                        multiline={true}
+                        numberOfLines={3}
+                        maxFontSizeMultiplier={1}
+                        maxLength={500}
+                        value={description}
+                        nativeID="description"
+                        caretHidden={false}
+                        onChangeText={setDescription}
+                        autoCompleteType="off"
+                        textAlignVertical="top"
+                        returnKeyType="default"
+                    />
+                    <Text style={styles.inputInfo}>{description.length}/500 characters</Text>
+                </View>}
             </View>
-            <View>
-                <Text style={styles.label}>Importance</Text>
-                <View style={styles.pickerWrapper}>
-                    <Picker
-                        prompt="Importance"
-                        selectedValue={imporntance}
-                        mode='dialog'
-                        onValueChange={(itemValue, _) => setImporntance(itemValue)}>
-                        {Object.keys(ImportanceLevel).map(x => (
-                            <Picker.Item
-                                key={x}
-                                label={ImportanceLevel[x]}
-                                value={x} />)
-                        )}
-                    </Picker>
+            <View style={styles.inputWrapper} >
+                <View style={styles.importanceWrapper}>
+                    <Text style={styles.label}>Importance</Text>
+                    <View style={styles.pickerWrapper}>
+                        <Picker
+                            prompt="Importance"
+                            selectedValue={imporntance}
+                            mode='dialog'
+                            onValueChange={(itemValue, _) => setImporntance(itemValue)}>
+                            {Object.keys(ImportanceLevel).map(x => (
+                                <Picker.Item
+                                    key={x}
+                                    label={ImportanceLevel[x]}
+                                    value={x} />)
+                            )}
+                        </Picker>
+                    </View>
                 </View>
                 <Text style={styles.inputInfo}>Select a level of importance</Text>
             </View>
 
-            <View style={styles.remindDateWrapper}>
+            <View style={styles.dateWrapper}>
+                <Text style={styles.label}>Task date</Text>
+                <View style={styles.dateButtonsWrapper}>
+                    <TouchableComponent
+                        onPress={() => showDatePickerHandler('task')}>
+                        <Text
+                            style={{
+                                ...styles.dateButtonText,
+                                ...{ color: `rgba(0, 0, 0, ${!isTaskDateSet ? 0.35 : 1})` }
+                            }}>
+                            {isTaskDateSet
+                                ? moment(taskDate).format('dddd, DD MMM YYYY, HH:mm')
+                                : 'Pick a time...'}
+                        </Text>
+                    </TouchableComponent>
+
+                    {isTaskDateSet &&
+                        <TouchableComponent
+                            style={styles.clearButton}
+                            onPress={() => clearDateHandler('task')}>
+                            <MaterialCommunityIcons
+                                name="eraser"
+                                size={22}
+                                color={Colors.primary}
+                            />
+                        </TouchableComponent>}
+                </View>
+                {isTaskDatePickerVisible && <DateTimePickerModal
+                    date={taskDate}
+                    isVisible={isTaskDatePickerVisible}
+                    mode="datetime"
+                    onConfirm={date => confirmDatePickerHandler(date, 'task')}
+                    onCancel={() => cancelDatePickerHandler('task')}
+                />}
+            </View>
+
+            <View style={styles.dateWrapper}>
                 <Text style={styles.label}>Remind at</Text>
-                <View style={styles.remindDateButtonsWrapper}>
+                <View style={styles.dateButtonsWrapper}>
                     <TouchableComponent
                         onPress={showDatePickerHandler}>
                         <Text
-                            style={{ ...styles.remindDateButtonText, ...{ color: `rgba(0, 0, 0, ${!isRemindDateSet ? 0.35 : 1})` } }}>
+                            style={{
+                                ...styles.dateButtonText,
+                                ...{ color: `rgba(0, 0, 0, ${!isRemindDateSet ? 0.35 : 1})` }
+                            }}>
                             {isRemindDateSet
                                 ? moment(remindDate).format('dddd, DD MMM YYYY, HH:mm')
                                 : 'Pick a time...'}
                         </Text>
                     </TouchableComponent>
 
-                    {
-                        isRemindDateSet &&
+                    {isRemindDateSet &&
                         <TouchableComponent
                             style={styles.clearButton}
-                            onPress={clearRemindDateHandler}>
+                            onPress={clearDateHandler}>
                             <MaterialCommunityIcons
                                 name="eraser"
-                                size={28}
+                                size={22}
                                 color={Colors.primary}
                             />
-                        </TouchableComponent>
-                    }
+                        </TouchableComponent>}
                 </View>
-                <DateTimePickerModal
+                {isRemindDatePickerVisible && <DateTimePickerModal
                     date={remindDate}
-                    isVisible={isDatePickerVisible}
+                    isVisible={isRemindDatePickerVisible}
                     mode="datetime"
                     onConfirm={confirmDatePickerHandler}
                     onCancel={cancelDatePickerHandler}
-                />
+                />}
             </View>
+
+
             <View style={styles.saveButtonWrapper}>
                 <Button
                     disabled={!titleOk}
-                    onPress={submitHandler}>
+                    onPress={submitHandler}
+                    loading={loading}
+                    >
                     Save
                 </Button>
             </View>
@@ -240,16 +323,23 @@ const styles = StyleSheet.create({
         flex: 1,
         paddingHorizontal: screenWidth < 300 ? 5 : screenWidth < 600 ? 15 : 30,
     },
+    error: {
+        color: Colors.danger,
+        minHeight: 10
+    },
+    inputWrapper: {
+        marginBottom: 8
+    },
     label: {
-        marginTop: 10,
-        marginHorizontal: 20,
+        marginHorizontal: 5,
         fontWeight: 'bold'
     },
     inputInfo: {
         fontSize: 10,
         fontWeight: 'bold',
         color: 'rgba(0, 0, 0, 0.35)',
-        paddingHorizontal: 5
+        paddingHorizontal: 5,
+        textAlign: 'right'
     },
     input: {
         borderColor: Colors.secondary,
@@ -260,35 +350,31 @@ const styles = StyleSheet.create({
         margin: 5
     },
     pickerWrapper: {
+        flex: 1,
         borderColor: Colors.secondary,
         borderWidth: 0,
         borderBottomWidth: 2,
         paddingHorizontal: 5,
-        marginHorizontal: 5,
         marginBottom: 5
     },
-    remindDateWrapper: {
-        flexDirection: 'column',
+    dateWrapper: {
+        flexDirection: 'row', justifyContent: 'flex-start', alignItems: 'center'
     },
-    remindDateButtonsWrapper: {
-        flexDirection: 'row',
-        justifyContent: 'center',
-        alignItems: 'stretch',
-        margin: 5
+    dateButtonsWrapper: {
+        flexDirection: 'row', justifyContent: 'flex-start', alignItems: 'baseline'
     },
-    remindDateButtonText: {
-        fontSize: 16,
+    dateButtonText: {
+        fontSize: 12,
         marginVertical: 10,
         paddingHorizontal: 10,
         paddingBottom: 5,
         borderWidth: 0,
         borderColor: Colors.secondary,
         borderBottomWidth: 2,
-        minWidth: 200,
         textAlign: 'center'
     },
     clearButton: {
-        padding: 10,
+        padding: 8,
         marginHorizontal: 6,
         justifyContent: 'center',
     },
@@ -296,7 +382,10 @@ const styles = StyleSheet.create({
         marginTop: 30,
         justifyContent: 'flex-end',
         marginBottom: 30
-    }
+    },
+    descriptionTitle: { flexDirection: 'row', justifyContent: 'flex-start', alignItems: 'center' },
+    expandChevron: { textAlign: 'center', textAlignVertical: 'center' },
+    importanceWrapper: { flexDirection: 'row', justifyContent: 'flex-start', alignItems: 'center' }
 });
 
 export default NewTaskScreen;

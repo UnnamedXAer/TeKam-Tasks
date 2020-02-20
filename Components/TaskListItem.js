@@ -1,6 +1,5 @@
 import React from 'react';
 import { View, Text, StyleSheet, } from 'react-native';
-import { TouchableOpacity, TouchableNativeFeedback } from 'react-native-gesture-handler';
 import Card from './Card';
 import Colors from '../Constants/Colors';
 import { dateToLocalString } from '../Utils/time';
@@ -8,18 +7,15 @@ import ImportanceLevel from '../Constants/ImportanceLevels';
 import TaskError from './TaskError';
 import TaskCompleteCheckbox from './TaskCompleteCheckbox';
 import TaskMenu from './TaskMenu';
-import Menu from './Menu';
 
-const TaskListItem = ({ task, onTaskComplete, onTaskDelete, isLoading, error, openMenu }) => {
-
+const TaskListItem = ({ task, toggleTaskComplete, deleteTask, isLoading, isCompleted, error }) => {
     return (
         <Card>
             <View style={styles.task}>
                 <TaskError error={error} />
                 <View style={styles.titleWrapper}>
-                <TaskMenu onDelete={onTaskDelete} isEnabled={!isLoading} openMenu={openMenu} taskId={task.id} />
                     <Text style={styles.title} numberOfLines={2}>{task.title}</Text>
-                    <TaskCompleteCheckbox onTaskComplete={onTaskComplete} isLoading={isLoading} isCompleted={task.isCompleted} />
+                    <TaskCompleteCheckbox toggleTaskComplete={toggleTaskComplete} isLoading={isLoading} isCompleted={task.isCompleted} />
                 </View>
                 <View style={styles.details}>
                     <Text style={styles.detailText}>{task.createDate && dateToLocalString(task.createDate)}</Text>
@@ -47,15 +43,19 @@ const TaskListItem = ({ task, onTaskComplete, onTaskDelete, isLoading, error, op
                     <Text style={styles.detailText}>Completed at {dateToLocalString(task.completedAt)}</Text>
                 </View>}
             </View>
+            <TaskMenu 
+                isCompleted={isCompleted}
+                isEnabled={!isLoading} 
+                deleteTask={deleteTask} 
+                toggleTaskComplete={toggleTaskComplete} 
+                 />
         </Card>);
 };
 
 const styles = StyleSheet.create({
     task: {
         flex: 1,
-        padding: 10,
-        position: 'relative',
-        overflow: 'visible'
+        paddingHorizontal: 10,
     },
     titleWrapper: {
         flexDirection: 'row',
@@ -64,12 +64,10 @@ const styles = StyleSheet.create({
         borderBottomColor: Colors.sDark,
         borderBottomWidth: 1,
         marginHorizontal: 5,
-        marginVertical: 8,
-        position: 'relative',
-        overflow: 'visible'
+        marginTop: 0,
     },
     title: {
-        maxWidth: '90%',
+        width: '90%',
         fontSize: 18
     },
     details: {
@@ -90,7 +88,7 @@ const styles = StyleSheet.create({
         marginTop: 10,
         alignSelf: 'flex-end'
     },
-    
+
 });
 
 export default TaskListItem;

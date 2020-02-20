@@ -4,7 +4,7 @@ import { Feather } from '@expo/vector-icons';
 import { View, Text, StyleSheet, Platform, ActivityIndicator } from 'react-native';
 import Colors from '../Constants/Colors';
 
-const TaskCompleteCheckbox = ({ isLoading, isCompleted, onTaskComplete }) => {
+const TaskCompleteCheckbox = ({ isLoading, isCompleted, toggleTaskComplete }) => {
 
     let TouchableComponent = TouchableOpacity;
     if (Platform.OS === 'android' && Platform.Version >= 21) {
@@ -18,7 +18,8 @@ const TaskCompleteCheckbox = ({ isLoading, isCompleted, onTaskComplete }) => {
                     ...styles.completeTask,
                     backgroundColor: isCompleted ? Colors.secondary : ''
                 }}
-                onPress={isLoading ? void 0 : onTaskComplete}>
+                disabled={isLoading}
+                onPress={toggleTaskComplete}>
                 {isLoading
                     ? <View
                         style={styles.taskLoading}>

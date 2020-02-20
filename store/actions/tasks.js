@@ -50,17 +50,16 @@ export const toggleComplete = (id, markAsCompleted) => {
         const completeDate = markAsCompleted ? new Date().toISOString() : null;
         setTimeout(async () => {
             try {
-                const { data } = await axios.patch(url, {
+                await axios.patch(url, {
                     isCompleted: markAsCompleted,
                     completedAt: completeDate
                 });
-                
                 dispatch(toggleCompleteSuccess(id, markAsCompleted, completeDate));
             }
             catch (err) {
-                // const message = err.response ? err.response.data.error : err.message
-                const message = `Sorry, could not mark task as ${markAsCompleted ? 'completed' : 'pending'}.\nPlease, refresh and try again.`;
-                alert(message);
+                const message = `Sorry, could not mark task as ${markAsCompleted
+                    ? 'completed'
+                    : 'pending'}.\nPlease, refresh and try again.`;
                 dispatch(toggleCompleteFail(message, id, markAsCompleted));
             }
         }, 233);
@@ -87,7 +86,7 @@ const toggleCompleteFail = (error, id, markAsCompleted) => {
     return {
         type: actionTypes.TOGGLE_COMPLETE_FAIL,
         error,
-        id, 
+        id,
         markAsCompleted
     };
 };
@@ -139,7 +138,7 @@ export const saveNewTask = (task) => {
 
         try {
             const { data } = await axios.post('/tasks.json', task);
-            task = {...task, id: data.name};
+            task = { ...task, id: data.name };
             dispatch(saveNewTaskSuccess(task));
         }
         catch (err) {
@@ -173,5 +172,43 @@ export const setRedirectFromNewTaskScreen = (redirect) => {
     return {
         type: actionTypes.SET_REDIRECT_FROM_NEW_TASK_SCREEN,
         redirect
+    };
+};
+
+export const deleteTask = (id, isCompleted) => {
+    return async dispatch => {
+        dispatch(deleteTaskStart(id));
+        const url = `/tasks/${id}.json`;
+        try {
+            await axios.delete(url);
+            dispatch(deleteTaskSuccess(id, isCompleted));
+        }
+        catch (err) {
+            const message = err.response ? err.response.data.error : err.message
+            dispatch(deleteTaskFail(message, id));
+        }
+    };
+};
+
+const deleteTaskStart = (id) => {
+    return {
+        type: actionTypes.DELETE_TASK_START,
+        id
+    };
+};
+
+const deleteTaskSuccess = (id, isCompleted) => {
+    return {
+        type: actionTypes.DELETE_TASK_SUCCESS,
+        id,
+        isCompleted
+    };
+};
+
+const deleteTaskFail = (error, id) => {
+    return {
+        type: actionTypes.DELETE_TASK_FAIL,
+        id,
+        error
     };
 };

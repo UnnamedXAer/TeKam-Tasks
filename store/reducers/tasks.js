@@ -45,7 +45,7 @@ const fetchTasksSuccess = (state, action) => {
 
     const dbIds = Object.keys(tasks);
     const updatedTasks = [];
-    const updatedTasksErrors = {...state.tasksErrors};
+    const updatedTasksErrors = { ...state.tasksErrors };
     dbIds.forEach(id => {
         if (updatedTasksErrors[id]) {
             updatedTasksErrors[id] = false;
@@ -111,28 +111,19 @@ const toggleCompleteSuccess = (state, action) => {
 
     if (markAsCompleted) { // was pending will be completed 
         const task = state.pending.find(x => x.id === id);
-        if (!task) {
-            debugger;
-        }
-        else {
-            task.isCompleted = markAsCompleted;
-            task.completedAt = completeDate;
-            updatedPendingTasks = state.pending.filter(x => x.id !== id);
-            updatedCompletedTasks = state.completed.concat(task);
-        }
 
+        task.isCompleted = markAsCompleted;
+        task.completedAt = completeDate;
+        updatedPendingTasks = state.pending.filter(x => x.id !== id);
+        updatedCompletedTasks = state.completed.concat(task);
     }
     else {
         const task = state.completed.find(x => x.id === id);
-        if (!task) {
-            debugger;
-        }
-        else {
-            task.isCompleted = markAsCompleted; 
-            task.completedAt = completeDate;
-            updatedCompletedTasks = state.completed.filter(x => x.id !== id);
-            updatedPendingTasks = state.pending.concat(task);
-        }
+        
+        task.isCompleted = markAsCompleted;
+        task.completedAt = completeDate;
+        updatedCompletedTasks = state.completed.filter(x => x.id !== id);
+        updatedPendingTasks = state.pending.concat(task);
     }
 
     return {
@@ -218,6 +209,42 @@ const setRedirectFromNewTaskScreen = (state, action) => {
     };
 };
 
+const deleteTaskStart = (state, action) => {
+    const { id } = action;
+    return {
+        ...state,
+        tasksErrors: { ...state.tasksErrors, [id]: null },
+        tasksLoading: { ...state.tasksLoading, [id]: true }
+    };
+};
+
+const deleteTaskSuccess = (state, action) => {
+    const { id, isCompleted } = action;
+    const updatedState = {
+        ...state,
+        tasksErrors: { ...state.tasksErrors, [id]: null },
+        tasksLoading: { ...state.tasksLoading, [id]: true }
+    };
+
+    if (isCompleted) {
+        updatedState.completed = updatedState.completed.filter(x => x.id !== id);
+    }
+    else {
+        updatedState.pending = updatedState.pending.filter(x => x.id !== id);
+    }
+
+    return updatedState;
+}
+
+const deleteTaskFail = (state, action) => {
+    const { id, error } = action;
+    return {
+        ...state,
+        tasksErrors: { ...state.tasksErrors, [id]: error },
+        tasksLoading: { ...state.tasksLoading, [id]: false }
+    };
+};
+
 const reducer = (state = initialState, action) => {
     switch (action.type) {
         case actionTypes.FETCH_TASKS_START: return fetchTasksStart(state, action);
@@ -237,6 +264,11 @@ const reducer = (state = initialState, action) => {
         case actionTypes.SAVE_NEW_TASK_FAIL: return saveNewTaskFail(state, action);
 
         case actionTypes.SET_REDIRECT_FROM_NEW_TASK_SCREEN: return setRedirectFromNewTaskScreen(state, action);
+
+        case actionTypes.DELETE_TASK_START: return deleteTaskStart(state, action);
+        case actionTypes.DELETE_TASK_SUCCESS: return deleteTaskSuccess(state, action);
+        case actionTypes.DELETE_TASK_FAIL: return deleteTaskFail(state, action);
+
         default:
             return state;
     };

@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from 'react';
+import React, { useEffect } from 'react';
 import {
     View,
     StyleSheet,
@@ -14,13 +14,9 @@ import Header from '../Components/Header';
 import Card from '../Components/Card';
 import Button from '../Components/Button';
 import { useSelector, useDispatch } from 'react-redux';
-import Menu from '../Components/Menu';
 import * as actions from '../store/actions';
 
 const TasksScreen = (props) => {
-    const [taskMenuPosition, setTaskMenuPosition] = useState(null);
-    const [taskMenuTaskId, setTaskMenuTaskId] = useState(null);
-
     const tasks = useSelector(state => state.tasks.pending);
     const loading = useSelector(state => state.tasks.loading);
     const error = useSelector(state => state.tasks.error);
@@ -33,52 +29,17 @@ const TasksScreen = (props) => {
         dispatch(actions.fetchTasks());
     }, []);
 
-    const completeTaskHandler = async id => {
+    const completeTaskHandler = id => {
         dispatch(actions.toggleComplete(id, true));
     };
 
-    const refreshHandler = async ev => {
+    const deleteTaskHandler = id => {
+        dispatch(actions.deleteTask(id, false));
+    };
+
+    const refreshHandler = () => {
         dispatch(actions.refreshTasks());
     };
-
-    const openTaskMenuHandler = (pos, taskId) => {
-        setTaskMenuPosition(pos);
-        setTaskMenuTaskId(taskId);
-    };
-
-    const clearTaskMenuValues = () => {
-        setTaskMenuPosition(null);
-        setTaskMenuTaskId(null);
-    };
-
-    const taskMenuOptions = [
-
-        {
-            label: 'Delete', onPress: () => {
-                console.log('I\'m deleting');
-
-            }
-        },
-        {
-            label: 'Complete', onPress: () => {
-                console.log('I\'m completing');
-                console.log('taskId:', taskMenuTaskId);
-                if (taskMenuTaskId) {
-                    // actions.toggleComplete(taskMenuTaskId)
-                }
-                else {
-                    alert('taskMenuTaskId: ' + taskMenuTaskId);
-                }
-                clearTaskMenuValues();
-            }
-        },
-        {
-            label: 'Share', onPress: () => {
-                console.log('I\'m sharing');
-            }
-        }
-    ];
-
 
     if (loading) {
         return <View style={[styles.screen, styles.positionInfo]}>
@@ -129,16 +90,16 @@ const TasksScreen = (props) => {
                     keyExtractor={(item, _) => item.id}
                     renderItem={({ item }) => (
                         <TaskListItem
-                            openMenu={openTaskMenuHandler}
                             error={tasksErrors[item.id]}
                             isLoading={!!tasksLoading[item.id]}
                             task={item}
-                            onTaskComplete={() => completeTaskHandler(item.id)}
+                            toggleTaskComplete={() => completeTaskHandler(item.id)}
+                            deleteTask={() => deleteTaskHandler(item.id)}
+                            isCompleted={false}
                         />
                     )}
                 />
             </>
-            {taskMenuPosition && <Menu options={taskMenuOptions} position={taskMenuPosition} />}
         </View>
     );
 };

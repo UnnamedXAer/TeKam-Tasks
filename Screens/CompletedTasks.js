@@ -1,12 +1,12 @@
 import React, { useEffect } from 'react';
-import { 
-    View, 
-    StyleSheet, 
-    FlatList, 
-    Text, 
-    RefreshControl, 
-    Dimensions, 
-    ActivityIndicator 
+import {
+    View,
+    StyleSheet,
+    FlatList,
+    Text,
+    RefreshControl,
+    Dimensions,
+    ActivityIndicator
 } from 'react-native';
 import TaskListItem from '../Components/TaskListItem';
 import Card from '../Components/Card';
@@ -32,20 +32,19 @@ const CompletedTasksScreen = () => {
         dispatch(actions.toggleComplete(id, false));
     };
 
-    const refreshHandler = ev => {
+    const refreshHandler = () => {
         dispatch(actions.refreshTasks(true));
     };
 
     const deleteTaskHandler = id => {
-        console.log('I\'m deleting. ', id);
-        // dispatch something
+        dispatch(actions.deleteTask(id, true));
     }
 
     if (loading) {
         return <View style={[styles.screen, styles.positionInfo]}>
-            <ActivityIndicator 
-                color={Colors.secondary} 
-                size="large" 
+            <ActivityIndicator
+                color={Colors.secondary}
+                size="large"
                 style={{ scaleX: 1.5, scaleY: 1.5 }} />
         </View>;
     }
@@ -84,13 +83,14 @@ const CompletedTasksScreen = () => {
                     style={styles.tasksList}
                     data={tasks}
                     keyExtractor={(item, _) => item.id}
-                    renderItem={({item}) => (
+                    renderItem={({ item }) => (
                         <TaskListItem
+                            task={item}
                             isLoading={!!tasksLoading[item.id]}
                             error={tasksErrors[item.id]}
-                            task={item}
-                            onTaskComplete={() => uncompleteTaskHandler(item.id)}
-                            onTaskDelete={() => deleteTaskHandler(item.id)}
+                            isCompleted={true}
+                            toggleTaskComplete={() => uncompleteTaskHandler(item.id)}
+                            deleteTask={() => deleteTaskHandler(item.id)}
                         />
                     )}
                 />

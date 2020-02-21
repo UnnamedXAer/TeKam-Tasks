@@ -1,5 +1,6 @@
 import axios from '../../axios/axios';
 import * as actionTypes from './actionTypes';
+import getErrorMessage from '../../Utils/getErrorMessage';
 
 export const fetchTasks = (forCompleted = false) => {
     return async dispatch => {
@@ -142,8 +143,11 @@ export const saveNewTask = (task) => {
             dispatch(saveNewTaskSuccess(task));
         }
         catch (err) {
-            const message = err.response ? err.response.data.error : err.message
-            dispatch(saveNewTaskFail(message));
+            dispatch(
+                saveNewTaskFail(
+                    getErrorMessage(err)
+                )
+            );
         }
     };
 };

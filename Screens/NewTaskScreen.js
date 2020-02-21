@@ -1,5 +1,14 @@
 import React, { useState, useRef, useEffect } from 'react';
-import { View, Text, StyleSheet, ScrollView, TextInput, Platform, Picker, Dimensions, Alert, ActivityIndicator } from 'react-native';
+import {
+    View,
+    Text,
+    StyleSheet,
+    ScrollView,
+    TextInput,
+    Platform,
+    Picker,
+    Dimensions, Alert
+} from 'react-native';
 import { MaterialCommunityIcons, Entypo } from '@expo/vector-icons';
 import { TouchableOpacity, TouchableNativeFeedback } from 'react-native-gesture-handler';
 import DateTimePickerModal from 'react-native-modal-datetime-picker';
@@ -17,7 +26,9 @@ const screenWidth = Dimensions.get('screen').width;
 
 
 const NewTaskScreen = (props) => {
-    const TouchableComponent = Platform.OS === 'android' ? TouchableNativeFeedback : TouchableOpacity;
+    const TouchableComponent = Platform.OS === 'android'
+        ? TouchableNativeFeedback
+        : TouchableOpacity;
 
     const [title, setTitle] = useState('');
     const [description, setDescription] = useState('');
@@ -48,34 +59,6 @@ const NewTaskScreen = (props) => {
             dispatch(actions.setRedirectFromNewTaskScreen(false));
         }
     }, [redirect])
-
-    useEffect(() => {
-        if (error) {
-            Alert.alert(
-                'Alert Title',
-                'My Alert Msg',
-                [
-                    {
-                        text: 'Ask me later',
-                        onPress: () => console.log('Ask me later pressed')
-                    },
-                    {
-                        text: 'Cancel',
-                        onPress: () => console.log('Cancel Pressed'),
-                        style: 'cancel',
-                    },
-                    {
-                        text: 'OK',
-                        onPress: () => console.log('OK Pressed')
-                    },
-                ],
-                { cancelable: false },
-            );
-        }
-        return () => {
-
-        };
-    }, [error])
 
     const titleChangeHandler = (value) => {
         if (!titleTouched) {
@@ -134,7 +117,10 @@ const NewTaskScreen = (props) => {
                 setTitleTouched(true);
             }
             titleRef.current.focus();
-            return Toast.showWithGravity('Please, fill at least title.', Toast.SHORT, Toast.CENTER);
+            return Toast.showWithGravity(
+                'Please, fill at least title.',
+                Toast.SHORT, Toast.CENTER
+            );
         }
 
         const newTask = new Task(
@@ -149,6 +135,11 @@ const NewTaskScreen = (props) => {
 
     const toggleDescriptionHandler = () => {
         setDescriptionVisible(prevState => !prevState);
+    };
+
+    const titleSubmitHandler = () => {
+        setDescriptionVisible(true);
+        descriptionRef.current.focus();
     }
 
     const titleOk = isTitleFilled();
@@ -157,14 +148,19 @@ const NewTaskScreen = (props) => {
             style={styles.screen}
         >
             <View style={styles.error}>
-                {error && <Text>{error}</Text>}
+                {error && <>
+                    <Text style={styles.errorTitleText}>Saving problem</Text>
+                    <Text style={styles.errorText}>{error}</Text>
+                </>}
             </View>
             <View style={styles.inputWrapper}>
                 <Text style={styles.label}>Activity title</Text>
                 <TextInput
                     style={{
                         ...styles.input,
-                        ...((!titleOk && titleTouched) ? { borderBottomColor: Colors.danger } : {})
+                        ...((!titleOk && titleTouched)
+                            ? { borderBottomColor: Colors.danger }
+                            : {})
                     }}
                     ref={titleRef}
                     placeholder="Activity in few words..."
@@ -177,7 +173,7 @@ const NewTaskScreen = (props) => {
                     // autoFocus={true}
                     importantForAutofill="no"
                     returnKeyType="next"
-                    onSubmitEditing={ev => descriptionRef.current.focus()}
+                    onSubmitEditing={titleSubmitHandler}
                 />
                 <Text style={styles.inputInfo}>{title.length}/50 characters</Text>
             </View>
@@ -187,11 +183,17 @@ const NewTaskScreen = (props) => {
                 borderBottomWidth: descriptionVisible ? 0 : 2,
                 paddingBottom: descriptionVisible ? 0 : 5
             }}>
-                <TouchableComponent onPress={toggleDescriptionHandler} style={styles.descriptionTitle}>
-                    <Entypo name={descriptionVisible ? 'chevron-small-up' : 'chevron-small-down'} size={22} style={styles.expandChevron} />
+                <TouchableComponent
+                    onPress={toggleDescriptionHandler}
+                    style={styles.descriptionTitle} >
+                    <Entypo
+                        name={descriptionVisible ? 'chevron-small-up' : 'chevron-small-down'}
+                        size={22}
+                        style={styles.expandChevron} />
                     <Text style={styles.label}>Activity description</Text>
                 </TouchableComponent>
-                {descriptionVisible && <View style={styles.inputWrapper}>
+                {<View
+                    style={[styles.inputWrapper, descriptionVisible ? {} : { display: "none" }]}>
                     <TextInput
                         style={styles.input}
                         ref={descriptionRef}
@@ -310,7 +312,7 @@ const NewTaskScreen = (props) => {
                     disabled={!titleOk}
                     onPress={submitHandler}
                     loading={loading}
-                    >
+                >
                     Save
                 </Button>
             </View>
@@ -324,8 +326,18 @@ const styles = StyleSheet.create({
         paddingHorizontal: screenWidth < 300 ? 5 : screenWidth < 600 ? 15 : 30,
     },
     error: {
-        color: Colors.danger,
         minHeight: 10
+    },
+    errorTitleText:{
+        marginTop: 10,
+        fontSize: 10,
+        fontStyle: 'italic',
+        color: Colors.danger
+    },
+    errorText: {
+        marginVertical: 15,
+        color: Colors.danger,
+        textAlign: 'center'
     },
     inputWrapper: {
         marginBottom: 8
@@ -358,10 +370,14 @@ const styles = StyleSheet.create({
         marginBottom: 5
     },
     dateWrapper: {
-        flexDirection: 'row', justifyContent: 'flex-start', alignItems: 'center'
+        flexDirection: 'row',
+        justifyContent: 'flex-start',
+        alignItems: 'center'
     },
     dateButtonsWrapper: {
-        flexDirection: 'row', justifyContent: 'flex-start', alignItems: 'baseline'
+        flexDirection: 'row',
+        justifyContent: 'flex-start',
+        alignItems: 'baseline'
     },
     dateButtonText: {
         fontSize: 12,
@@ -383,9 +399,20 @@ const styles = StyleSheet.create({
         justifyContent: 'flex-end',
         marginBottom: 30
     },
-    descriptionTitle: { flexDirection: 'row', justifyContent: 'flex-start', alignItems: 'center' },
-    expandChevron: { textAlign: 'center', textAlignVertical: 'center' },
-    importanceWrapper: { flexDirection: 'row', justifyContent: 'flex-start', alignItems: 'center' }
+    descriptionTitle: {
+        flexDirection: 'row',
+        justifyContent: 'flex-start',
+        alignItems: 'center'
+    },
+    expandChevron: {
+        textAlign: 'center',
+        textAlignVertical: 'center'
+    },
+    importanceWrapper: {
+        flexDirection: 'row',
+        justifyContent: 'flex-start',
+        alignItems: 'center'
+    }
 });
 
 export default NewTaskScreen;

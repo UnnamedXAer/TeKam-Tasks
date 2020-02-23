@@ -32,7 +32,9 @@ const NewTaskScreen = (props) => {
 
     const [title, setTitle] = useState('');
     const [description, setDescription] = useState('');
-    const [imporntance, setImporntance] = useState(ImportanceLevel.NORMAL);
+    const [imporntance, setImporntance] = useState(
+        Object.keys(ImportanceLevel).find(x => ImportanceLevel[x] === ImportanceLevel.NORMAL)
+    );
     const [titleTouched, setTitleTouched] = useState(false);
     const [descriptionVisible, setDescriptionVisible] = useState(false);
 
@@ -328,7 +330,7 @@ const styles = StyleSheet.create({
     error: {
         minHeight: 10
     },
-    errorTitleText:{
+    errorTitleText: {
         marginTop: 10,
         fontSize: 10,
         fontStyle: 'italic',

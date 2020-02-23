@@ -26,7 +26,7 @@ const TaskListItem = ({ task, toggleTaskComplete, deleteTask, isLoading, isCompl
                             fontWeight: task.importance === ImportanceLevel.IMPORTANT ? 'bold' : 'normal'
                         }}
                     >
-                        {task.importance}
+                        {ImportanceLevel[task.importance]}
                     </Text>
                     <Text
                         style={{

@@ -2,53 +2,68 @@ import React from 'react';
 import { View, Text, StyleSheet, } from 'react-native';
 import Card from './Card';
 import Colors from '../Constants/Colors';
-import { dateToLocalString } from '../Utils/time';
+import { dateToLocalString, datefromNow } from '../Utils/time';
 import ImportanceLevel from '../Constants/ImportanceLevels';
 import TaskError from './TaskError';
 import TaskCompleteCheckbox from './TaskCompleteCheckbox';
 import TaskMenu from './TaskMenu';
+import { MaterialCommunityIcons } from '@expo/vector-icons';
 
 const TaskListItem = ({ task, toggleTaskComplete, deleteTask, isLoading, isCompleted, error }) => {
     return (
         <Card>
             <View style={styles.task}>
                 <TaskError error={error} />
+                <View style={styles.taskDateWrapper}>
+                    <Text style={[
+                        styles.taskDate,
+                        task.taskDate && new Date(task.taskDate) < new Date() ? { color: Colors.danger } : {}
+                    ]}>
+                        {task.taskDate && datefromNow(task.taskDate)}
+                    </Text>
+                </View>
                 <View style={styles.titleWrapper}>
                     <Text style={styles.title} numberOfLines={2}>{task.title}</Text>
                     <TaskCompleteCheckbox toggleTaskComplete={toggleTaskComplete} isLoading={isLoading} isCompleted={task.isCompleted} />
                 </View>
                 <View style={styles.details}>
-                    <Text style={styles.detailText}>{task.createDate && dateToLocalString(task.createDate)}</Text>
+
                     <Text
                         style={{
                             ...styles.detailText,
                             textAlign: 'center',
-                            fontWeight: task.importance === ImportanceLevel.IMPORTANT ? 'bold' : 'normal'
+                            fontWeight: task.importance === ImportanceLevel.HIGH ? 'bold' : 'normal'
                         }}
                     >
                         {ImportanceLevel[task.importance]}
                     </Text>
-                    <Text
-                        style={{
-                            ...styles.detailText,
-                            color: task.reminderAt && new Date(task.reminderAt) < new Date() ? Colors.danger : undefined
-                        }}
-                    >
-                        {task.reminderAt && dateToLocalString(task.reminderAt)}</Text>
+                    <View>
+                        {task.reminderAt && <>
+                            <Text
+                                numberOfLines={1}
+                                style={styles.detailText}
+                            >
+                                <MaterialCommunityIcons name="bell-ring-outline" />
+                                {' ' + dateToLocalString(task.reminderAt)}</Text>
+                        </>}
+                    </View>
                 </View>
-                <View style={styles.descriptionWrapper}>
+
+                {task.description ? <View style={styles.descriptionWrapper}>
                     <Text style={styles.description} numberOfLines={3}>{task.description}</Text>
-                </View>
+                </View> : null}
+
                 {task.isCompleted && <View style={styles.completedWrapper}>
                     <Text style={styles.detailText}>Completed at {dateToLocalString(task.completedAt)}</Text>
                 </View>}
+
             </View>
-            <TaskMenu 
+            <TaskMenu
                 isCompleted={isCompleted}
-                isEnabled={!isLoading} 
-                deleteTask={deleteTask} 
-                toggleTaskComplete={toggleTaskComplete} 
-                 />
+                isEnabled={!isLoading}
+                deleteTask={deleteTask}
+                toggleTaskComplete={toggleTaskComplete}
+            />
         </Card>);
 };
 
@@ -56,6 +71,15 @@ const styles = StyleSheet.create({
     task: {
         flex: 1,
         paddingHorizontal: 10,
+    },
+    directionRow: {
+        flexDirection: 'row'
+    },
+    taskDateWrapper: {
+        marginLeft: 10
+    },
+    taskDate: {
+        fontSize: 12
     },
     titleWrapper: {
         flexDirection: 'row',
@@ -75,7 +99,6 @@ const styles = StyleSheet.create({
         justifyContent: 'space-between'
     },
     detailText: {
-        flex: 0.3,
         fontSize: 10
     },
     descriptionWrapper: {
@@ -87,8 +110,7 @@ const styles = StyleSheet.create({
     completedWrapper: {
         marginTop: 10,
         alignSelf: 'flex-end'
-    },
-
+    }
 });
 
 export default TaskListItem;

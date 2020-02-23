@@ -15,6 +15,7 @@ export default class Task {
         isCompleted,
         importance,
         reminderAt,
+        taskDate
     ) {
         this.id = Math.random() + '_' + Math.random()
         this.title = title;
@@ -22,6 +23,7 @@ export default class Task {
         this.isCompleted = isCompleted;
         this.importance = importance;
         this.reminderAt = reminderAt  && reminderAt.toISOString();
+        this.taskDate = taskDate  && taskDate.toISOString();
         this.createDate = new Date().toISOString();
         this.completedAt = void 0;
     }

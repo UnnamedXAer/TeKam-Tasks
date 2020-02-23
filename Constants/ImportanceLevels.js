@@ -1,7 +1,7 @@
 const ImportanceLevel = {
-    IMPORTANT: 'Important',
-    NORMAL: 'Normal',
-    NOT_IMPORTANT: 'Not Important'
+    HIGH: 'High',
+    MEDIUM: 'Medium',
+    LOW: 'Low'
 };
 
 export default ImportanceLevel;

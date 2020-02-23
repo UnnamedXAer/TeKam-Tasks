@@ -21,9 +21,7 @@ import Task from '../Models/Task';
 import { useDispatch, useSelector } from 'react-redux';
 import * as actions from '../store/actions';
 
-
 const screenWidth = Dimensions.get('screen').width;
-
 
 const NewTaskScreen = (props) => {
     const TouchableComponent = Platform.OS === 'android'
@@ -33,7 +31,7 @@ const NewTaskScreen = (props) => {
     const [title, setTitle] = useState('');
     const [description, setDescription] = useState('');
     const [imporntance, setImporntance] = useState(
-        Object.keys(ImportanceLevel).find(x => ImportanceLevel[x] === ImportanceLevel.NORMAL)
+        Object.keys(ImportanceLevel).find(x => ImportanceLevel[x] === ImportanceLevel.MEDIUM)
     );
     const [titleTouched, setTitleTouched] = useState(false);
     const [descriptionVisible, setDescriptionVisible] = useState(false);
@@ -130,7 +128,8 @@ const NewTaskScreen = (props) => {
             description.trim(),
             false,
             imporntance,
-            isRemindDateSet ? remindDate : void 0
+            isRemindDateSet ? remindDate : void 0,
+            isTaskDateSet ? taskDate : void 0
         )
         dispatch(actions.saveNewTask(newTask));
     };

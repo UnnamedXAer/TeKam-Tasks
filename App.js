@@ -2,7 +2,7 @@ import React from 'react';
 import { AppLoading } from 'expo';
 import { enableScreens } from 'react-native-screens';
 import AppNavigator from './Navigation/AppNavigator';
-import { combineReducers, createStore, applyMiddleware } from 'redux';
+import { combineReducers, createStore, applyMiddleware, compose } from 'redux';
 import reduxThunkMiddleware from 'redux-thunk';
 import { Provider } from 'react-redux';
 import contextMenuReducer from './store/reducers/contextMenu';
@@ -16,7 +16,11 @@ const rootReducer = combineReducers({
   tasks: tasksReducer
 });
 
-const store = createStore(rootReducer, applyMiddleware(reduxThunkMiddleware));
+
+const composeEnhancers = window.__REDUX_DEVTOOLS_EXTENSION_COMPOSE__ || compose;
+const store = createStore(rootReducer, composeEnhancers(
+  applyMiddleware(reduxThunkMiddleware)
+));
 
 enableScreens();
 

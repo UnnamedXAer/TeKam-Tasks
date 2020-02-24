@@ -36,13 +36,13 @@ const NewTaskScreen = (props) => {
     const [titleTouched, setTitleTouched] = useState(false);
     const [descriptionVisible, setDescriptionVisible] = useState(false);
 
-    const [isRemindDatePickerVisible, setIsRemindDatePickerVisible] = useState(false);
-    const [remindDate, setRemindDate] = useState(new Date());
-    const [isRemindDateSet, setIsRemindDateSet] = useState(false);
-
     const [isTaskDatePickerVisible, setIsTaskDatePickerVisible] = useState(false);
-    const [taskDate, setTaskDate] = useState(new Date());
+    const [taskDate, setTaskDate] = useState(new Date(Date.now() + 1000 * 60 * 60));
     const [isTaskDateSet, setIsTaskDateSet] = useState(false);
+
+    const [isRemindDatePickerVisible, setIsRemindDatePickerVisible] = useState(false);
+    const [remindDate, setRemindDate] = useState(new Date(Date.now() + 1000 * 60 * 55));
+    const [isRemindDateSet, setIsRemindDateSet] = useState(false);
 
     const titleRef = useRef(null);
     const descriptionRef = useRef(null);
@@ -86,15 +86,46 @@ const NewTaskScreen = (props) => {
     };
 
     const confirmDatePickerHandler = (date, relatedVar) => {
+        // if (relatedVar === 'task') {
+        //     setIsTaskDatePickerVisible(false);
+        //     setIsTaskDateSet(true);
+        //     setTaskDate(date);
+        // }
+        // else {
+        //     setIsRemindDatePickerVisible(false);
+        //     setIsRemindDateSet(true);
+        //     setRemindDate(date);
+        // }
+
+        console.log(0);
+
         if (relatedVar === 'task') {
-            setIsTaskDatePickerVisible(false);
-            setIsTaskDateSet(true);
-            setTaskDate(date);
+            if (date <= new Date()) {
+                Alert.alert('Wrong Time', 'Please, select the task time from the future.');
+                setIsTaskDatePickerVisible(false);
+            }
+            else {
+                if (isRemindDateSet && remindDate >= date) {
+                    Alert.alert('Note', 'The reminder time is set to time later than task time.');
+                }
+                setIsTaskDatePickerVisible(false);
+                setIsTaskDateSet(true);
+                setTaskDate(date);
+            }
         }
         else {
             setIsRemindDatePickerVisible(false);
-            setIsRemindDateSet(true);
-            setRemindDate(date);
+
+            if (isTaskDateSet && date >= taskDate) {
+                Alert.alert('Wrong Time', 'Please, select the reminder time earlier than the task time.');
+            }
+            else if (date <= new Date()) {
+                Alert.alert('Wrong Time', 'Please, select the reminder time from the future.');
+            }
+            else {
+                setIsRemindDateSet(true);
+                setRemindDate(date);
+            }
         }
 
     };
@@ -121,6 +152,14 @@ const NewTaskScreen = (props) => {
                 'Please, fill at least title.',
                 Toast.SHORT, Toast.CENTER
             );
+        }
+
+        const currentDate = new Date();
+        if (isTaskDateSet && taskDate < currentDate) {
+            Alert.alert('Note', 'Task time is from the past.');
+        }
+        else if (isRemindDateSet && remindDate < currentDate) {
+            Alert.alert('Note', 'Reminder time is from the past, the remind will not be pushed.');
         }
 
         const newTask = new Task(
@@ -264,6 +303,8 @@ const NewTaskScreen = (props) => {
                 </View>
                 {isTaskDatePickerVisible && <DateTimePickerModal
                     date={taskDate}
+                    is24Hour={true}
+                    minimumDate={new Date(Date.now() + 1000 * 60)}
                     isVisible={isTaskDatePickerVisible}
                     mode="datetime"
                     onConfirm={date => confirmDatePickerHandler(date, 'task')}
@@ -301,6 +342,7 @@ const NewTaskScreen = (props) => {
                 {isRemindDatePickerVisible && <DateTimePickerModal
                     date={remindDate}
                     isVisible={isRemindDatePickerVisible}
+                    is24Hour={true}
                     mode="datetime"
                     onConfirm={confirmDatePickerHandler}
                     onCancel={cancelDatePickerHandler}

@@ -4,8 +4,8 @@ import moment from "moment";
  * 
  * @returns {String} convertedDate
  */
-export function dateToLocalString(date) {
-	const d = moment(date).format('ddd, DD MMM, HH:mm');
+export function dateToLocalString(date, withYear) {
+	const d = moment(date).format(`ddd, DD MMM${withYear ? ' YYYY' : ''}, HH:mm`);
 	return d;
 }
 
@@ -15,22 +15,24 @@ export function dateToLocalString(date) {
  * @returns {String} convertedDate
  */
 export function datefromNow(date) {
-	const dayInMs = 1000 * 60 * 60 * 24;
+	const oneDayInMs = 1000 * 60 * 60 * 24;
 
 	const d = moment(date);
-	if (d.isSame(moment(), 'day')) {
-		return `Today, ${d.format('HH:mm')} (${d.fromNow(false)})`;
-	}
-	if (d.isBefore()) {
-		if (d.isSame(Date.now() - dayInMs, 'day')) {
-			return 'Yesterday, ' + d.format('HH:mm');
+
+	if (d.isSameOrAfter()) {
+		if (d.isSame(Date.now() + oneDayInMs, 'day')) {
+			return 'Tomorrow, ' + d.format('HH:mm')+ ' (left ' + d.fromNow(true) + ')';
 		}
-		return d.format('dddd, DD MMM, HH:mm') + ' (' + d.fromNow(false) + ')';
+		else {
+			return d.format('dddd, DD MMM, HH:mm') + ' (left ' + d.fromNow(true) + ')';
+		}
 	}
 	else {
-		if (d.isSame(Date.now() + dayInMs, 'day')) {
-			return 'Tomorrow, ' + d.format('HH:mm');
+		if (d.isSame(Date.now() - oneDayInMs, 'day')) {
+			return 'Yesterday, ' + d.format('HH:mm')+ ' (expired ' + d.fromNow(false) + ')';
+		}
+		else {
+			return d.format('dddd, DD MMM, HH:mm') + ' (expired ' + d.fromNow(false) + ')';
 		}
 	}
-	return d.format('dddd, DD MMM, HH:mm');
 }

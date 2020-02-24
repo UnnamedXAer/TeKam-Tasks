@@ -54,7 +54,7 @@ const TaskListItem = ({ task, toggleTaskComplete, deleteTask, isLoading, isCompl
                 </View> : null}
 
                 {task.isCompleted && <View style={styles.completedWrapper}>
-                    <Text style={styles.detailText}>Completed at {dateToLocalString(task.completedAt)}</Text>
+                    <Text style={styles.detailText}>Completed at {dateToLocalString(task.completedAt, true)}</Text>
                 </View>}
 
             </View>

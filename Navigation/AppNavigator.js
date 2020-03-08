@@ -1,7 +1,7 @@
 import React from 'react';
 import { Platform } from 'react-native';
-import { createStackNavigator } from "react-navigation-stack";
-import { createAppContainer } from "react-navigation";
+import { createAppContainer, createSwitchNavigator } from "react-navigation";
+import { createStackNavigator, Assets } from "react-navigation-stack";
 import { createBottomTabNavigator } from "react-navigation-tabs";
 import { createMaterialBottomTabNavigator } from 'react-navigation-material-bottom-tabs';
 import { createDrawerNavigator } from 'react-navigation-drawer';
@@ -14,6 +14,7 @@ import Colors from '../Constants/Colors';
 import CompletedTasks from '../Screens/CompletedTasks';
 import FiltersScreen from '../Screens/FiltersScreen';
 import EmptyScreen from '../Screens/EmptyScreen';
+import AuthScreen from '../Screens/AuthScreen';
 
 const defaultNavigationOptions = (navData) => {
     return {
@@ -145,7 +146,7 @@ const FiltersStackNavigation = createStackNavigator({
     defaultNavigationOptions
 });
 
-const MainNavigator = createDrawerNavigator({
+const DrawerNAvigator = createDrawerNavigator({
     Tasks: {
         screen: TabNavigator,
         navigationOptions: (navData) => {
@@ -179,6 +180,22 @@ const MainNavigator = createDrawerNavigator({
         activeTintColor: Colors.sDark,
         inactiveTintColor: Colors.pLight
     }
+});
+
+const AuthStackNavigation = createStackNavigator({
+    Auth: {
+        screen: AuthScreen,
+        navigationOptions: {
+            title: 'Authorization'
+        }
+    }
+}, {
+    defaultNavigationOptions: defaultNavigationOptions
+})
+
+const MainNavigator = createSwitchNavigator({
+    // Auth: AuthStackNavigation,
+    Tasks: DrawerNAvigator
 })
 
 export default createAppContainer(MainNavigator);

@@ -11,7 +11,7 @@ import {
 import TaskListItem from '../Components/TaskListItem';
 import Colors from '../Constants/Colors';
 import Header from '../Components/Header';
-import Card from '../Components/Card';
+import Cart from '../Components/Cart';
 import Button from '../Components/Button';
 import { useSelector, useDispatch } from 'react-redux';
 import * as actions from '../store/actions';
@@ -54,10 +54,10 @@ const TasksScreen = (props) => {
 
     if (error) {
         floatedInfo = <View style={[styles.screen, styles.floatedInfoPanel]}>
-            <Card>
+            <Cart>
                 <Header>Opss, somethig went wrong. 😵😱😵</Header>
                 <View><Text>{error}</Text></View>
-            </Card>
+            </Cart>
         </View>;
     }
     else if (tasks.length === 0) {

@@ -1,6 +1,6 @@
 import React from 'react';
 import { View, Text, StyleSheet, } from 'react-native';
-import Card from './Card';
+import Cart from './Cart';
 import Colors from '../Constants/Colors';
 import { dateToLocalString, datefromNow } from '../Utils/time';
 import ImportanceLevel from '../Constants/ImportanceLevels';
@@ -11,7 +11,7 @@ import { MaterialCommunityIcons } from '@expo/vector-icons';
 
 const TaskListItem = ({ task, toggleTaskComplete, deleteTask, isLoading, isCompleted, error }) => {
     return (
-        <Card>
+        <Cart>
             <View style={styles.task}>
                 <TaskError error={error} />
                 <View style={styles.taskDateWrapper}>
@@ -64,7 +64,7 @@ const TaskListItem = ({ task, toggleTaskComplete, deleteTask, isLoading, isCompl
                 deleteTask={deleteTask}
                 toggleTaskComplete={toggleTaskComplete}
             />
-        </Card>);
+        </Cart>);
 };
 
 const styles = StyleSheet.create({

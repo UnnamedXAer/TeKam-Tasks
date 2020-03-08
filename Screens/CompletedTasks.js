@@ -9,7 +9,7 @@ import {
     ActivityIndicator
 } from 'react-native';
 import TaskListItem from '../Components/TaskListItem';
-import Card from '../Components/Card';
+import Cart from '../Components/Cart';
 import Header from '../Components/Header';
 import Colors from '../Constants/Colors';
 import { useDispatch, useSelector } from 'react-redux';
@@ -53,10 +53,10 @@ const CompletedTasksScreen = () => {
 
     if (error) {
         floatedInfo = <View style={[styles.screen, styles.floatedInfoPanel]}>
-            <Card>
+            <Cart>
                 <Header>Opss, somethig went wrong. 😵😱😵</Header>
                 <View><Text>{error}</Text></View>
-            </Card>
+            </Cart>
         </View>;
     }
     else if (tasks.length === 0) {

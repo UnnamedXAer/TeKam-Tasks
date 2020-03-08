@@ -4,7 +4,7 @@ import Header from '../Components/Header';
 import { Switch } from 'react-native-gesture-handler';
 import Colors from '../Constants/Colors';
 import { RadioButton, TouchableRipple, Checkbox } from 'react-native-paper';
-import Card from '../Components/Card';
+import Cart from '../Components/Cart';
 
 const screenWidth = Dimensions.get('screen').width;
 
@@ -32,7 +32,7 @@ const FiltersScreen = (props) => {
     return (
         <ScrollView style={styles.screen}>
             <Header>Available Filters / Sort Options</Header>
-            <Card>
+            <Cart>
                 <View>
                     <Text style={[styles.label, styles.bold]}>Order By</Text>
                     <Picker
@@ -67,7 +67,7 @@ const FiltersScreen = (props) => {
                         </View>
                     </TouchableRipple>
                 </View>
-            </Card>
+            </Cart>
 
 {/* 
             <Card>

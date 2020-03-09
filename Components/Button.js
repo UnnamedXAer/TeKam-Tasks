@@ -1,18 +1,38 @@
 import React from 'react';
 import { View, Text, StyleSheet, ActivityIndicator } from 'react-native';
-import { TouchableOpacity, TouchableNativeFeedback, TouchableWithoutFeedback } from 'react-native-gesture-handler';
+import { 
+    TouchableOpacity, 
+    TouchableNativeFeedback, 
+    TouchableWithoutFeedback 
+} from 'react-native-gesture-handler';
 import Colors from '../Constants/Colors';
 
-const Button = ({ onPress, children, disabled, loading }) => {
-    const TouchableComponent = disabled 
-    ? TouchableWithoutFeedback 
-    : Platform.OS === 'android' ? TouchableNativeFeedback : TouchableOpacity;
+const Button = ({
+    onPress,
+    children,
+    disabled,
+    loading,
+    filled = true,
+    styleText = {},
+    style = {}
+}) => {
+    const TouchableComponent = disabled
+        ? TouchableWithoutFeedback
+        : Platform.OS === 'android' ? TouchableNativeFeedback : TouchableOpacity;
     return (
         <TouchableComponent onPress={onPress} disabled={loading} >
-            <View style={{ ...styles.button, ...(disabled ? styles.disabled : {}) }}>
+            <View style={[
+                styles.button,
+                (disabled ? styles.disabled : {}),
+                (filled ? styles.filled : styles.notFilled),
+                style
+            ]}>
                 {loading
-                ? <ActivityIndicator color={Colors.primary} size="small" />
-                : <Text style={{ ...styles.text, ...(disabled ? styles.disabledText : {}) }}>{children}</Text>}
+                    ? <ActivityIndicator color={Colors.primary} size="small" />
+                    : <Text
+                        style={[styles.text, (disabled ? styles.disabledText : {}), styleText]}>
+                        {children}
+                    </Text>}
             </View>
         </TouchableComponent>
     );
@@ -23,9 +43,18 @@ const styles = StyleSheet.create({
         height: 45,
         paddingHorizontal: 10,
         paddingVertical: 10,
-        backgroundColor: Colors.secondary,
         alignItems: 'center',
         justifyContent: 'center'
+    },
+    filled: {
+        backgroundColor: Colors.secondary,
+        borderColor: Colors.secondary,
+        borderWidth: 2
+    },
+    notFilled: {
+        backgroundColor: Colors.white,
+        borderColor: Colors.secondary,
+        borderWidth: 2
     },
     text: {
         color: Colors.primary,

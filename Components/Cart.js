@@ -5,9 +5,9 @@ import Colors from '../Constants/Colors';
 const Cart = props => {
     return (
         <View style={styles.card}>
-        <View style={styles.cardContent}>
-            {props.children}
-        </View>
+            <View style={styles.cardContent}>
+                {props.children}
+            </View>
         </View>
     );
 };

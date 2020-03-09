@@ -194,7 +194,7 @@ const AuthStackNavigation = createStackNavigator({
 })
 
 const MainNavigator = createSwitchNavigator({
-    // Auth: AuthStackNavigation,
+    Auth: AuthStackNavigation,
     Tasks: DrawerNAvigator
 })
 

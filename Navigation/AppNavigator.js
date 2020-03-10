@@ -2,12 +2,13 @@ import React from 'react';
 import { Platform } from 'react-native';
 import { createAppContainer, createSwitchNavigator } from "react-navigation";
 import { createStackNavigator, Assets } from "react-navigation-stack";
+import { createStackNavigator } from "react-navigation-stack";
 import { createBottomTabNavigator } from "react-navigation-tabs";
 import { createMaterialBottomTabNavigator } from 'react-navigation-material-bottom-tabs';
 import { createDrawerNavigator } from 'react-navigation-drawer';
 import { FontAwesome, MaterialIcons } from '@expo/vector-icons';
-import TasksScreen from '../Screens/TasksScreen';
 import { HeaderButtons, Item } from 'react-navigation-header-buttons';
+import TasksScreen from '../Screens/TasksScreen';
 import CustomHeaderButton from '../Components/CustomHeaderButton';
 import NewTaskScreen from '../Screens/NewTaskScreen';
 import Colors from '../Constants/Colors';
@@ -15,6 +16,7 @@ import CompletedTasks from '../Screens/CompletedTasks';
 import FiltersScreen from '../Screens/FiltersScreen';
 import EmptyScreen from '../Screens/EmptyScreen';
 import AuthScreen from '../Screens/AuthScreen';
+import StartScreen from '../Screens/StartScreen';
 
 const defaultNavigationOptions = (navData) => {
     return {
@@ -29,7 +31,7 @@ const stackNavigationHeaderLeft = (navData) => <HeaderButtons HeaderButtonCompon
     <Item title="Menu" iconName="ios-menu" onPress={() => {
         navData.navigation.toggleDrawer();
     }} />
-</HeaderButtons>
+</HeaderButtons>;
 
 const TasksStackNavigation = createStackNavigator({
     Tasks: {
@@ -194,6 +196,7 @@ const AuthStackNavigation = createStackNavigator({
 })
 
 const MainNavigator = createSwitchNavigator({
+    Start: StartScreen,
     Auth: AuthStackNavigation,
     Tasks: DrawerNAvigator
 })

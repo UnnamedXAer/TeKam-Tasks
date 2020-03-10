@@ -49,7 +49,7 @@ const formReducer = (state, action) => {
     return { ...state };
 }
 
-const AuthScreen = () => {
+const AuthScreen = (props) => {
 
     const dispatch = useDispatch();
     const [formState, dispatchForm] = useReducer(formReducer, getInitialFormState());
@@ -100,25 +100,25 @@ const AuthScreen = () => {
 
         const { emailAddress, password } = formState.values;
         if (isLogIn) {
-            // if (!emailAddress || !password) {
-            //     setLoading(false);
-            //     return setError('Wrong credentials!');
-            // }
+            if (!emailAddress || !password) {
+                setLoading(false);
+                return setError('Wrong credentials!');
+            }
         }
         else {
-            // if (!formState.validities.emailAddress || !formState.validities.password) {
-            //     setLoading(false);
-            //     return setError('Please correct marked fields.');
-            // }
+            if (!formState.validities.emailAddress || !formState.validities.password) {
+                setLoading(false);
+                return setError('Please correct marked fields.');
+            }
         }
         try {
             await dispatch(authorize(emailAddress, password, isLogIn));
+            props.navigation.navigate('Tasks');
         }
         catch (err) {
             setError(err.message);
+            setLoading(false);
         }
-
-        setLoading(false);
     };
 
     return (

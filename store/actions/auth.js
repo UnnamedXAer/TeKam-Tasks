@@ -1,6 +1,7 @@
 import { AUTHORIZE, LOGOUT } from "./actionTypes";
 import axios from "../../axios/axios";
 import { FIREBASE_API_KEY } from "../../env";
+import { AsyncStorage } from "react-native";
 
 export const authorize = (emailAddress, password, isLogIn) => {
     return async dispatch => {
@@ -15,14 +16,7 @@ export const authorize = (emailAddress, password, isLogIn) => {
                 returnSecureToken: true
             });
 
-            console.log(response);
-
-            dispatch({
-                type: AUTHORIZE,
-                token: response.data.idToken,
-                emailAddress: response.data.email,
-                expirationTime: Date.now() + response.data.exporesIn * 1000
-            });
+            dispatch(logIn(response.data.email, response.data.idToken, Date.now() + response.data.expiresIn * 1000));
         }
         catch (err) {
             if (err.isAxiosError) {
@@ -70,6 +64,26 @@ export const authorize = (emailAddress, password, isLogIn) => {
         }
     };
 };
+
+export const logIn = (emailAddress, token, expirationTime) => {
+    return async dispatch => {
+        await AsyncStorage.setItem('userData', JSON.stringify({
+            token,
+            emailAddress,
+            expirationTime
+        }));
+
+        const action = {
+            type: AUTHORIZE,
+            payload: {
+                token,
+                emailAddress,
+                expirationTime
+            }
+        };
+        dispatch(action);
+    }
+}
 
 export const logOut = () => {
     return {

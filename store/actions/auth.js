@@ -86,7 +86,11 @@ export const logIn = (emailAddress, token, expirationTime) => {
 }
 
 export const logOut = () => {
-    return {
-        LOGOUT
-    };
+    return async dispatch => {
+        await AsyncStorage.removeItem('userData');
+
+        dispatch({
+            type: LOGOUT
+        });
+    }
 };

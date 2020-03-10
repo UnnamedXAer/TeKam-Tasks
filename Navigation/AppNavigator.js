@@ -1,13 +1,13 @@
 import React from 'react';
-import { Platform } from 'react-native';
-import { createAppContainer, createSwitchNavigator } from "react-navigation";
-import { createStackNavigator, Assets } from "react-navigation-stack";
+import { Platform, View } from 'react-native';
+import { createAppContainer, createSwitchNavigator, SafeAreaView } from "react-navigation";
 import { createStackNavigator } from "react-navigation-stack";
 import { createBottomTabNavigator } from "react-navigation-tabs";
 import { createMaterialBottomTabNavigator } from 'react-navigation-material-bottom-tabs';
-import { createDrawerNavigator } from 'react-navigation-drawer';
+import { createDrawerNavigator, DrawerItems } from 'react-navigation-drawer';
 import { FontAwesome, MaterialIcons } from '@expo/vector-icons';
 import { HeaderButtons, Item } from 'react-navigation-header-buttons';
+import { useDispatch } from 'react-redux';
 import TasksScreen from '../Screens/TasksScreen';
 import CustomHeaderButton from '../Components/CustomHeaderButton';
 import NewTaskScreen from '../Screens/NewTaskScreen';
@@ -17,6 +17,8 @@ import FiltersScreen from '../Screens/FiltersScreen';
 import EmptyScreen from '../Screens/EmptyScreen';
 import AuthScreen from '../Screens/AuthScreen';
 import StartScreen from '../Screens/StartScreen';
+import { logOut } from '../store/actions';
+import Button from '../Components/Button';
 
 const defaultNavigationOptions = (navData) => {
     return {
@@ -181,6 +183,34 @@ const DrawerNAvigator = createDrawerNavigator({
     contentOptions: {
         activeTintColor: Colors.sDark,
         inactiveTintColor: Colors.pLight
+    },
+    contentComponent: (props) => {
+        const dispatch = useDispatch();
+
+        return <View style={{
+            flex: 1,
+            paddingTop: 30
+        }}>
+            <SafeAreaView forceInset={{ top: 'always', horizontal: 'never' }}>
+                <DrawerItems
+                    {...props} />
+                <Button
+                    styleText={{
+                        fontSize: 14,
+                        color: Colors.pLight
+                    }}
+                    style={{
+                        backgroundColor: Colors.white,
+                        borderColor: Colors.white,
+                        paddingLeft: 10,
+                        alignItems: 'flex-start'
+                    }}
+                    onPress={() => {
+                        dispatch(logOut());
+                        props.navigation.navigate('Auth');
+                    }}>Log Out</Button>
+            </SafeAreaView>
+        </View>;
     }
 });
 

@@ -5,9 +5,13 @@ import getErrorMessage from '../../Utils/getErrorMessage';
 export const fetchTasks = (forCompleted = false) => {
     return async (dispatch, getState) => {
         dispatch(fetchTasksStart(forCompleted));
-        const { token } = getState().auth;
-        const url = `/tasks.json?orderBy="isCompleted"&equalTo=${forCompleted}&auth=${token}`;
+        const { token, userId } = getState().auth;
+        if (!token) {
+            debugger;
+        }
+        const url = `/tasks/${userId}.json?orderBy="isCompleted"&equalTo=${forCompleted}&auth=${token}`;
         try {
+            console.log('fetching tasks: ', `userId: ${userId}, token: ${token !== null ? token.substr(0, 10) + '...' : token}`);
             const { data } = await axios.get(url);
             if (typeof data !== 'object') {
                 throw new Error('Wrong response type.');
@@ -46,12 +50,13 @@ const fetchTasksFail = (error, forCompleted) => {
 
 export const toggleComplete = (id, markAsCompleted) => {
     return async (dispatch, getState) => {
-        const { token } = getState().auth;
+        const { token, userId } = getState().auth;
         dispatch(toggleCompleteStart(id));
-        const url = `/tasks/${id}.json?auth=${token}`;
+        const url = `/tasks/${userId}/${id}.json?auth=${token}`;
         const completeDate = markAsCompleted ? new Date().toISOString() : null;
         setTimeout(async () => {
             try {
+                console.log('completing task')
                 await axios.patch(url, {
                     isCompleted: markAsCompleted,
                     completedAt: completeDate
@@ -96,9 +101,10 @@ const toggleCompleteFail = (error, id, markAsCompleted) => {
 export const refreshTasks = (forCompleted = false) => {
     return async (dispatch, getState) => {
         dispatch(refreshTasksStart(forCompleted));
-        const { token } = getState().auth;
-        const url = `/tasks.json?orderBy="isCompleted"&equalTo=${forCompleted}&auth=${token}`;
+        const { token, userId } = getState().auth;
+        const url = `/tasks/${userId}.json?orderBy="isCompleted"&equalTo=${forCompleted}&auth=${token}`;
         try {
+            console.log('refreshing tasks')
             const { data } = await axios.get(url);
             if (typeof data !== 'object') {
                 throw new Error('Wrong response type.');
@@ -137,11 +143,12 @@ const refreshTasksFail = (error, forCompleted) => {
 
 export const saveNewTask = (task) => {
     return async (dispatch, getState) => {
-        const { token } = getState().auth;
+        const { token, userId } = getState().auth;
         dispatch(saveNewTaskStart());
 
         try {
-            const { data } = await axios.post(`/tasks.json?auth=${token}`, task);
+            console.log('new task')
+            const { data } = await axios.post(`/tasks/${userId}.json?auth=${token}`, task);
             task = { ...task, id: data.name };
             dispatch(saveNewTaskSuccess(task));
         }
@@ -184,9 +191,10 @@ export const setRedirectFromNewTaskScreen = (redirect) => {
 
 export const deleteTask = (id, isCompleted) => {
     return async (dispatch, getState) => {
-        const { token } = getState().auth;
+        const { token, userId } = getState().auth;
         dispatch(deleteTaskStart(id));
-        const url = `/tasks/${id}?auth=${token}.json`;
+        console.log('delete task')
+        const url = `/tasks/${userId}/${id}?auth=${token}.json`;
         try {
             await axios.delete(url);
             dispatch(deleteTaskSuccess(id, isCompleted));

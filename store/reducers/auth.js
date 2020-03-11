@@ -4,7 +4,8 @@ const initialState = {
     user: {
         emailAddress: null,
         token: null,
-        userId: null
+        userId: null,
+        expirationTime: null
     }
 };
 

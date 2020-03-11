@@ -16,7 +16,12 @@ export const authorize = (emailAddress, password, isLogIn) => {
                 returnSecureToken: true
             });
 
-            dispatch(logIn(response.data.email, response.data.idToken, Date.now() + response.data.expiresIn * 1000));
+            dispatch(logIn(
+                response.data.localId,
+                response.data.email,
+                response.data.idToken,
+                Date.now() + response.data.expiresIn * 1000
+            ));
         }
         catch (err) {
             if (err.isAxiosError) {
@@ -65,21 +70,21 @@ export const authorize = (emailAddress, password, isLogIn) => {
     };
 };
 
-export const logIn = (emailAddress, token, expirationTime) => {
+export const logIn = (userId, emailAddress, token, expirationTime) => {
     return async dispatch => {
-        await AsyncStorage.setItem('userData', JSON.stringify({
+
+        const userData = {
+            userId,
             token,
             emailAddress,
             expirationTime
-        }));
+        };
+
+        await AsyncStorage.setItem('userData', JSON.stringify(userData));
 
         const action = {
             type: AUTHORIZE,
-            payload: {
-                token,
-                emailAddress,
-                expirationTime
-            }
+            payload: userData
         };
         dispatch(action);
     }

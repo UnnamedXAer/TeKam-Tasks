@@ -26,7 +26,7 @@ const TasksScreen = (props) => {
     const dispatch = useDispatch();
 
     useEffect(() => {
-        dispatch(actions.fetchTasks());
+            dispatch(actions.fetchTasks());
     }, []);
 
     const completeTaskHandler = id => {

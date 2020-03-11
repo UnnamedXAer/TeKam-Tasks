@@ -23,6 +23,7 @@ const StartScreen = (props) => {
                 }
 
                 await dispatch(logIn(
+                    userData.userId,
                     userData.emailAddress,
                     userData.token,
                     userData.expirationTime

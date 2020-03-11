@@ -3,10 +3,10 @@ import * as actionTypes from './actionTypes';
 import getErrorMessage from '../../Utils/getErrorMessage';
 
 export const fetchTasks = (forCompleted = false) => {
-    return async dispatch => {
+    return async (dispatch, getState) => {
         dispatch(fetchTasksStart(forCompleted));
-
-        const url = `/tasks.json?orderBy="isCompleted"&equalTo=${forCompleted}`;
+        const { token } = getState().auth;
+        const url = `/tasks.json?orderBy="isCompleted"&equalTo=${forCompleted}&auth=${token}`;
         try {
             const { data } = await axios.get(url);
             if (typeof data !== 'object') {
@@ -45,9 +45,10 @@ const fetchTasksFail = (error, forCompleted) => {
 };
 
 export const toggleComplete = (id, markAsCompleted) => {
-    return async dispatch => {
+    return async (dispatch, getState) => {
+        const { token } = getState().auth;
         dispatch(toggleCompleteStart(id));
-        const url = `/tasks/${id}.json`;
+        const url = `/tasks/${id}.json?auth=${token}`;
         const completeDate = markAsCompleted ? new Date().toISOString() : null;
         setTimeout(async () => {
             try {
@@ -93,9 +94,10 @@ const toggleCompleteFail = (error, id, markAsCompleted) => {
 };
 
 export const refreshTasks = (forCompleted = false) => {
-    return async dispatch => {
+    return async (dispatch, getState) => {
         dispatch(refreshTasksStart(forCompleted));
-        const url = `/tasks.json?orderBy="isCompleted"&equalTo=${forCompleted}`;
+        const { token } = getState().auth;
+        const url = `/tasks.json?orderBy="isCompleted"&equalTo=${forCompleted}&auth=${token}`;
         try {
             const { data } = await axios.get(url);
             if (typeof data !== 'object') {
@@ -134,11 +136,12 @@ const refreshTasksFail = (error, forCompleted) => {
 };
 
 export const saveNewTask = (task) => {
-    return async dispatch => {
+    return async (dispatch, getState) => {
+        const { token } = getState().auth;
         dispatch(saveNewTaskStart());
 
         try {
-            const { data } = await axios.post('/tasks.json', task);
+            const { data } = await axios.post(`/tasks.json?auth=${token}`, task);
             task = { ...task, id: data.name };
             dispatch(saveNewTaskSuccess(task));
         }
@@ -180,9 +183,10 @@ export const setRedirectFromNewTaskScreen = (redirect) => {
 };
 
 export const deleteTask = (id, isCompleted) => {
-    return async dispatch => {
+    return async (dispatch, getState) => {
+        const { token } = getState().auth;
         dispatch(deleteTaskStart(id));
-        const url = `/tasks/${id}.json`;
+        const url = `/tasks/${id}?auth=${token}.json`;
         try {
             await axios.delete(url);
             dispatch(deleteTaskSuccess(id, isCompleted));

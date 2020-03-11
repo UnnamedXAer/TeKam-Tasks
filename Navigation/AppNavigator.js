@@ -73,7 +73,7 @@ const CompletedTasksStackNavigation = createStackNavigator({
         screen: CompletedTasks,
         navigationOptions: (navData) => {
             return {
-                title: 'Tasks History',
+                title: 'Completed Tasks',
                 headerRight: () => <HeaderButtons HeaderButtonComponent={CustomHeaderButton} >
                     <Item title="Add" iconComponent="Entypo" iconName="add-to-list" onPress={() => {
                         navData.navigation.navigate('NewTask');
@@ -139,8 +139,7 @@ const FiltersStackNavigation = createStackNavigator({
                 title: 'Filters',
                 headerRight: () => <HeaderButtons HeaderButtonComponent={CustomHeaderButton} >
                     <Item title="Save" iconComponent="Feather" iconName="save" onPress={() => {
-                        const opener = navData.navigation.getParam('opener') || 'Tasks';
-                        navData.navigation.navigate(opener);
+                        navData.navigation.navigate('TasksTabs');
                     }} />
                 </HeaderButtons>,
             };
@@ -150,8 +149,8 @@ const FiltersStackNavigation = createStackNavigator({
     defaultNavigationOptions
 });
 
-const DrawerNAvigator = createDrawerNavigator({
-    Tasks: {
+const DrawerNavigator = createDrawerNavigator({
+    TasksTabs: {
         screen: TabNavigator,
         navigationOptions: (navData) => {
             return {
@@ -169,11 +168,13 @@ const DrawerNAvigator = createDrawerNavigator({
             };
         }
     },
-    Filters: {
+    FiltersStack: {
         screen: FiltersStackNavigation,
-        navigationOptions: {
-            title: 'Filters/Sort Options',
-            drawerLabel: 'Filters/Sort Options'
+        navigationOptions: (navData) => {
+            return {
+                title: 'Filters/Sort Options',
+                drawerLabel: 'Filters/Sort Options',
+            };
         }
     },
     About: {
@@ -214,7 +215,7 @@ const DrawerNAvigator = createDrawerNavigator({
     }
 });
 
-const AuthStackNavigation = createStackNavigator({
+const AuthStackNavigator = createStackNavigator({
     Auth: {
         screen: AuthScreen,
         navigationOptions: {
@@ -227,8 +228,10 @@ const AuthStackNavigation = createStackNavigator({
 
 const MainNavigator = createSwitchNavigator({
     Start: StartScreen,
-    Auth: AuthStackNavigation,
-    Tasks: DrawerNAvigator
+    AuthStack: AuthStackNavigator,
+    TasksDrawer: DrawerNavigator,
+}, {
+    initialRouteName: 'Start'
 })
 
 export default createAppContainer(MainNavigator);

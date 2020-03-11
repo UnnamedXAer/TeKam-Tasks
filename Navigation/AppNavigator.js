@@ -1,5 +1,5 @@
 import React from 'react';
-import { Platform, View } from 'react-native';
+import { Platform, View, Text } from 'react-native';
 import { createAppContainer, createSwitchNavigator, SafeAreaView } from "react-navigation";
 import { createStackNavigator } from "react-navigation-stack";
 import { createBottomTabNavigator } from "react-navigation-tabs";
@@ -7,7 +7,7 @@ import { createMaterialBottomTabNavigator } from 'react-navigation-material-bott
 import { createDrawerNavigator, DrawerItems } from 'react-navigation-drawer';
 import { FontAwesome, MaterialIcons } from '@expo/vector-icons';
 import { HeaderButtons, Item } from 'react-navigation-header-buttons';
-import { useDispatch } from 'react-redux';
+import { useDispatch, useSelector } from 'react-redux';
 import TasksScreen from '../Screens/TasksScreen';
 import CustomHeaderButton from '../Components/CustomHeaderButton';
 import NewTaskScreen from '../Screens/NewTaskScreen';
@@ -187,12 +187,19 @@ const DrawerNavigator = createDrawerNavigator({
     },
     contentComponent: (props) => {
         const dispatch = useDispatch();
+        const emailAddress = useSelector(state => state.auth.emailAddress);
+
+        const textStyle = {color: Colors.pLight, fontStyle: 'italic', };
 
         return <View style={{
             flex: 1,
             paddingTop: 30
         }}>
             <SafeAreaView forceInset={{ top: 'always', horizontal: 'never' }}>
+                <View style={{ maxWidth: '100%', paddingHorizontal: 15, alignItems: 'flex-end' }}>
+                    <Text style={textStyle}>Hello</Text>
+                    <Text style={textStyle}>{emailAddress}</Text>
+                </View>
                 <DrawerItems
                     {...props} />
                 <Button

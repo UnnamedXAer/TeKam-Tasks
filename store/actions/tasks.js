@@ -6,12 +6,8 @@ export const fetchTasks = (forCompleted = false) => {
     return async (dispatch, getState) => {
         dispatch(fetchTasksStart(forCompleted));
         const { token, userId } = getState().auth;
-        if (!token) {
-            debugger;
-        }
         const url = `/tasks/${userId}.json?orderBy="isCompleted"&equalTo=${forCompleted}&auth=${token}`;
         try {
-            console.log('fetching tasks: ', `userId: ${userId}, token: ${token !== null ? token.substr(0, 10) + '...' : token}`);
             const { data } = await axios.get(url);
             if (typeof data !== 'object') {
                 throw new Error('Wrong response type.');
@@ -56,7 +52,6 @@ export const toggleComplete = (id, markAsCompleted) => {
         const completeDate = markAsCompleted ? new Date().toISOString() : null;
         setTimeout(async () => {
             try {
-                console.log('completing task')
                 await axios.patch(url, {
                     isCompleted: markAsCompleted,
                     completedAt: completeDate
@@ -104,7 +99,6 @@ export const refreshTasks = (forCompleted = false) => {
         const { token, userId } = getState().auth;
         const url = `/tasks/${userId}.json?orderBy="isCompleted"&equalTo=${forCompleted}&auth=${token}`;
         try {
-            console.log('refreshing tasks')
             const { data } = await axios.get(url);
             if (typeof data !== 'object') {
                 throw new Error('Wrong response type.');
@@ -147,7 +141,6 @@ export const saveNewTask = (task) => {
         dispatch(saveNewTaskStart());
 
         try {
-            console.log('new task')
             const { data } = await axios.post(`/tasks/${userId}.json?auth=${token}`, task);
             task = { ...task, id: data.name };
             dispatch(saveNewTaskSuccess(task));
@@ -193,7 +186,6 @@ export const deleteTask = (id, isCompleted) => {
     return async (dispatch, getState) => {
         const { token, userId } = getState().auth;
         dispatch(deleteTaskStart(id));
-        console.log('delete task')
         const url = `/tasks/${userId}/${id}?auth=${token}.json`;
         try {
             await axios.delete(url);

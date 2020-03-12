@@ -31,7 +31,6 @@ const StartScreen = (props) => {
                 props.navigation.navigate('Tasks');
             }
             catch (err) {
-                console.log('------------ > startScreen: ', err);
                 props.navigation.navigate('Auth');   
             }
         }

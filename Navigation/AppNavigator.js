@@ -50,19 +50,19 @@ const TasksStackNavigation = createStackNavigator({
             };
         },
     },
-    NewTask: {
-        screen: NewTaskScreen,
-        navigationOptions: (navData) => {
-            return {
-                title: 'Add Task',
-                // headerRight: () => <HeaderButtons HeaderButtonComponent={CustomHeaderButton} >
-                //     <Item title="Save" iconComponent="Feather" iconName="save" onPress={() => {
-                //         navData.navigation.navigate('Tasks');
-                //     }} />
-                // </HeaderButtons>,
-            };
-        },
-    }
+    // NewTask: {
+    //     screen: NewTaskScreen,
+    //     navigationOptions: (navData) => {
+    //         return {
+    //             title: 'Add Task',
+    //             // headerRight: () => <HeaderButtons HeaderButtonComponent={CustomHeaderButton} >
+    //             //     <Item title="Save" iconComponent="Feather" iconName="save" onPress={() => {
+    //             //         navData.navigation.navigate('Tasks');
+    //             //     }} />
+    //             // </HeaderButtons>,
+    //         };
+    //     },
+    // }
 }, {
     defaultNavigationOptions
 }
@@ -149,6 +149,29 @@ const FiltersStackNavigation = createStackNavigator({
     defaultNavigationOptions
 });
 
+const NewTaskStackNavigator = createStackNavigator({
+    NewTask: {
+        screen: NewTaskScreen,
+        navigationOptions: (navData) => {
+            return {
+                title: 'Add Task',
+                // headerRight: () => <HeaderButtons HeaderButtonComponent={CustomHeaderButton} >
+                //     <Item title="Save" iconComponent="Feather" iconName="save" onPress={() => {
+                //         navData.navigation.navigate('Tasks');
+                //     }} />
+                // </HeaderButtons>,
+                headerLeft: () => <HeaderButtons HeaderButtonComponent={CustomHeaderButton} >
+                    <Item title="Back" iconComponent="Ionicons" iconName={(Platform.OS === 'android' ? 'md' : 'ios') + '-arrow-back'} onPress={() => {
+                        navData.navigation.navigate('TasksTabs');
+                    }} />
+                </HeaderButtons>,
+            };
+        },
+    }
+}, {
+    defaultNavigationOptions
+});
+
 const DrawerNavigator = createDrawerNavigator({
     TasksTabs: {
         screen: TabNavigator,
@@ -160,7 +183,7 @@ const DrawerNavigator = createDrawerNavigator({
         }
     },
     NewTask: {
-        screen: NewTaskScreen,
+        screen: NewTaskStackNavigator,
         navigationOptions: (navData) => {
             return {
                 title: 'Add Task',
@@ -189,7 +212,7 @@ const DrawerNavigator = createDrawerNavigator({
         const dispatch = useDispatch();
         const emailAddress = useSelector(state => state.auth.emailAddress);
 
-        const textStyle = {color: Colors.pLight, fontStyle: 'italic', };
+        const textStyle = { color: Colors.pLight, fontStyle: 'italic', };
 
         return <View style={{
             flex: 1,

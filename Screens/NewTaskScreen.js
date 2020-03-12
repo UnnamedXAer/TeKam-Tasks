@@ -86,19 +86,6 @@ const NewTaskScreen = (props) => {
     };
 
     const confirmDatePickerHandler = (date, relatedVar) => {
-        // if (relatedVar === 'task') {
-        //     setIsTaskDatePickerVisible(false);
-        //     setIsTaskDateSet(true);
-        //     setTaskDate(date);
-        // }
-        // else {
-        //     setIsRemindDatePickerVisible(false);
-        //     setIsRemindDateSet(true);
-        //     setRemindDate(date);
-        // }
-
-        console.log(0);
-
         if (relatedVar === 'task') {
             if (date <= new Date()) {
                 Alert.alert('Wrong Time', 'Please, select the task time from the future.');
@@ -139,7 +126,6 @@ const NewTaskScreen = (props) => {
         }
     };
 
-
     const isTitleFilled = () => title.trim().length > 0;
 
     const submitHandler = ev => {
@@ -170,7 +156,22 @@ const NewTaskScreen = (props) => {
             isRemindDateSet ? remindDate : void 0,
             isTaskDateSet ? taskDate : void 0
         )
-        dispatch(actions.saveNewTask(newTask));
+        dispatch(actions.saveNewTask(newTask))
+            .then(() => {
+                clearForm();
+            });
+    };
+
+    const clearForm = () => {
+        setTitle('');
+        setTitleTouched(false);
+        setDescription('');
+        setDescriptionVisible(false);
+        setImporntance(Object.keys(ImportanceLevel).find(x => ImportanceLevel[x] === ImportanceLevel.MEDIUM));
+        setIsRemindDateSet(false);
+        setRemindDate(new Date(Date.now() + 1000 * 60 * 55));
+        setIsTaskDateSet(false);
+        setTaskDate(new Date(Date.now() + 1000 * 60 * 60));
     };
 
     const toggleDescriptionHandler = () => {
@@ -210,7 +211,6 @@ const NewTaskScreen = (props) => {
                     nativeID="title"
                     onChangeText={titleChangeHandler}
                     autoCompleteType="off"
-                    // autoFocus={true}
                     importantForAutofill="no"
                     returnKeyType="next"
                     onSubmitEditing={titleSubmitHandler}

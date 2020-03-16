@@ -6,6 +6,7 @@ export const fetchTasks = (forCompleted = false) => {
     return async (dispatch, getState) => {
         dispatch(fetchTasksStart(forCompleted));
         const { token, userId } = getState().auth;
+
         const url = `/tasks/${userId}.json?orderBy="isCompleted"&equalTo=${forCompleted}&auth=${token}`;
         try {
             const { data } = await axios.get(url);

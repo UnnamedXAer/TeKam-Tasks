@@ -16,17 +16,19 @@ export const authorize = (emailAddress, password, isLogIn) => {
                 returnSecureToken: true
             });
 
-            dispatch(logIn(
-                response.data.localId,
-                response.data.email,
-                response.data.idToken,
-                Date.now() + response.data.expiresIn * 1000
-            ));
+            const userData = {
+                userId: response.data.localId,
+                token: response.data.idToken,
+                emailAddress: response.data.email,
+                refreshToken: response.data.refreshToken,
+                expirationTime: Date.now() + (+response.data.expiresIn * 1000)
+            };
+            dispatch(logIn(userData));
+
         }
         catch (err) {
             if (err.isAxiosError) {
                 const message = err.response.data.error.message;
-                console.log(message);
                 if (message === 'TOO_MANY_ATTEMPTS_TRY_LATER') {
                     throw new Error(
                         'We have blocked all requests from this device due to unusual activity. Try again later.'
@@ -70,16 +72,8 @@ export const authorize = (emailAddress, password, isLogIn) => {
     };
 };
 
-export const logIn = (userId, emailAddress, token, expirationTime) => {
+export const logIn = (userData) => {
     return async dispatch => {
-
-        const userData = {
-            userId,
-            token,
-            emailAddress,
-            expirationTime
-        };
-
         await AsyncStorage.setItem('userData', JSON.stringify(userData));
 
         const action = {
@@ -87,6 +81,27 @@ export const logIn = (userId, emailAddress, token, expirationTime) => {
             payload: userData
         };
         dispatch(action);
+    }
+};
+
+export const authorizeByRefreshToken = (userData) => {
+    return async (dispatch) => {
+
+        const url = `https://securetoken.googleapis.com/v1/token?key=${FIREBASE_API_KEY}`;
+        try {
+            const response = await axios.post(url, {
+                refresh_token: userData.refreshToken,
+                grant_type: "refresh_token"
+            });
+
+            userData.refreshToken = response.data.refresh_token;
+            userData.token = response.data.access_token;
+            userData.expirationTime = Date.now() + (+response.data.expires_in * 1000);
+            dispatch(logIn(userData));
+        }
+        catch (err) {
+            throw err;
+        }
     }
 }
 

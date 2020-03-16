@@ -3,6 +3,7 @@ import { AUTHORIZE, LOGOUT } from "../actions/actionTypes";
 const initialState = {
     emailAddress: null,
     token: null,
+    refreshToken: null,
     userId: null,
     expirationTime: null
 };

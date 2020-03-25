@@ -78,7 +78,12 @@ const CompletedTasksScreen = () => {
                         title="refreshing..."
                         refreshing={refreshing}
                         onRefresh={refreshHandler}
-                        colors={[Colors.secondary, Colors.sLight, Colors.secondary, Colors.sDark]}
+                        colors={[
+                            Colors.secondary,
+                            Colors.sLight,
+                            Colors.secondary,
+                            Colors.sDark
+                        ]}
                         size="large" />}
                     style={styles.tasksList}
                     data={tasks}

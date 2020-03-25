@@ -93,7 +93,10 @@ const NewTaskScreen = (props) => {
             }
             else {
                 if (isRemindDateSet && remindDate >= date) {
-                    Alert.alert('Note', 'The reminder time is set to time later than task time.');
+                    Alert.alert(
+                        'Note',
+                        'The reminder time is set to time later than task time.'
+                    );
                 }
                 setIsTaskDatePickerVisible(false);
                 setIsTaskDateSet(true);
@@ -104,10 +107,16 @@ const NewTaskScreen = (props) => {
             setIsRemindDatePickerVisible(false);
 
             if (isTaskDateSet && date >= taskDate) {
-                Alert.alert('Wrong Time', 'Please, select the reminder time earlier than the task time.');
+                Alert.alert(
+                    'Wrong Time',
+                    'Please, select the reminder time earlier than the task time.'
+                );
             }
             else if (date <= new Date()) {
-                Alert.alert('Wrong Time', 'Please, select the reminder time from the future.');
+                Alert.alert(
+                    'Wrong Time',
+                    'Please, select the reminder time from the future.'
+                );
             }
             else {
                 setIsRemindDateSet(true);
@@ -145,7 +154,10 @@ const NewTaskScreen = (props) => {
             Alert.alert('Note', 'Task time is from the past.');
         }
         else if (isRemindDateSet && remindDate < currentDate) {
-            Alert.alert('Note', 'Reminder time is from the past, the remind will not be pushed.');
+            Alert.alert(
+                'Note',
+                'Reminder time is from the past, the remind will not be pushed.'
+            );
         }
 
         const newTask = new Task(
@@ -167,7 +179,9 @@ const NewTaskScreen = (props) => {
         setTitleTouched(false);
         setDescription('');
         setDescriptionVisible(false);
-        setImporntance(Object.keys(ImportanceLevel).find(x => ImportanceLevel[x] === ImportanceLevel.MEDIUM));
+        setImporntance(Object.keys(ImportanceLevel).find(
+            x => ImportanceLevel[x] === ImportanceLevel.MEDIUM)
+        );
         setIsRemindDateSet(false);
         setRemindDate(new Date(Date.now() + 1000 * 60 * 55));
         setIsTaskDateSet(false);
@@ -233,7 +247,10 @@ const NewTaskScreen = (props) => {
                     <Text style={styles.label}>Activity description</Text>
                 </TouchableComponent>
                 {<View
-                    style={[styles.inputWrapper, descriptionVisible ? {} : { display: "none" }]}>
+                    style={[
+                        styles.inputWrapper,
+                        descriptionVisible ? {} : { display: "none" }
+                    ]}>
                     <TextInput
                         style={styles.input}
                         ref={descriptionRef}
@@ -250,7 +267,9 @@ const NewTaskScreen = (props) => {
                         textAlignVertical="top"
                         returnKeyType="default"
                     />
-                    <Text style={styles.inputInfo}>{description.length}/500 characters</Text>
+                    <Text style={styles.inputInfo}>
+                        {description.length}/500 characters
+                    </Text>
                 </View>}
             </View>
             <View style={styles.inputWrapper} >

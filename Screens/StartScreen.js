@@ -24,9 +24,7 @@ const StartScreen = (props) => {
                     await dispatch(logIn(userData));
                 }
 
-                console.log('session will expire at: ', new Date(userData.expirationTime).toLocaleString());
                 setTimeout(async () => {
-                    console.log('session expired ', new Date().toLocaleString());
                     await getUserData();
                 }, (userData.expirationTime - currentTime))
 

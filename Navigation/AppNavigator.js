@@ -14,7 +14,7 @@ import NewTaskScreen from '../Screens/NewTaskScreen';
 import Colors from '../Constants/Colors';
 import CompletedTasks from '../Screens/CompletedTasks';
 import FiltersScreen from '../Screens/FiltersScreen';
-import EmptyScreen from '../Screens/EmptyScreen';
+import AboutScreen from '../Screens/AboutScreen';
 import AuthScreen from '../Screens/AuthScreen';
 import StartScreen from '../Screens/StartScreen';
 import { logOut } from '../store/actions';
@@ -49,20 +49,7 @@ const TasksStackNavigation = createStackNavigator({
                 headerLeft: () => stackNavigationHeaderLeft(navData)
             };
         },
-    },
-    // NewTask: {
-    //     screen: NewTaskScreen,
-    //     navigationOptions: (navData) => {
-    //         return {
-    //             title: 'Add Task',
-    //             // headerRight: () => <HeaderButtons HeaderButtonComponent={CustomHeaderButton} >
-    //             //     <Item title="Save" iconComponent="Feather" iconName="save" onPress={() => {
-    //             //         navData.navigation.navigate('Tasks');
-    //             //     }} />
-    //             // </HeaderButtons>,
-    //         };
-    //     },
-    // }
+    }
 }, {
     defaultNavigationOptions
 }
@@ -155,18 +142,20 @@ const NewTaskStackNavigator = createStackNavigator({
         navigationOptions: (navData) => {
             return {
                 title: 'Add Task',
-                // headerRight: () => <HeaderButtons HeaderButtonComponent={CustomHeaderButton} >
-                //     <Item title="Save" iconComponent="Feather" iconName="save" onPress={() => {
-                //         navData.navigation.navigate('Tasks');
-                //     }} />
-                // </HeaderButtons>,
                 headerLeft: () => <HeaderButtons HeaderButtonComponent={CustomHeaderButton} >
-                    <Item title="Back" iconComponent="Ionicons" iconName={(Platform.OS === 'android' ? 'md' : 'ios') + '-arrow-back'} onPress={() => {
-                        navData.navigation.navigate('TasksTabs');
-                    }} />
+                    <Item
+                        title="Back"
+                        iconComponent="Ionicons"
+                        iconName={
+                            (Platform.OS === 'android' ? 'md' : 'ios') + '-arrow-back'
+                        }
+                        onPress={() => {
+                            navData.navigation.navigate('TasksTabs');
+                        }} />
                 </HeaderButtons>,
             };
         },
+
     }
 }, {
     defaultNavigationOptions
@@ -201,7 +190,7 @@ const DrawerNavigator = createDrawerNavigator({
         }
     },
     About: {
-        screen: EmptyScreen
+        screen: AboutScreen
     }
 }, {
     contentOptions: {
@@ -219,7 +208,11 @@ const DrawerNavigator = createDrawerNavigator({
             paddingTop: 30
         }}>
             <SafeAreaView forceInset={{ top: 'always', horizontal: 'never' }}>
-                <View style={{ maxWidth: '100%', paddingHorizontal: 15, alignItems: 'flex-end' }}>
+                <View style={{
+                    maxWidth: '100%',
+                    paddingHorizontal: 15,
+                    alignItems: 'flex-end'
+                }}>
                     <Text style={textStyle}>Hello</Text>
                     <Text style={textStyle}>{emailAddress}</Text>
                 </View>

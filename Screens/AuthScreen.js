@@ -1,5 +1,12 @@
 import React, { useReducer, useState, useRef } from 'react';
-import { StyleSheet, Text, View, KeyboardAvoidingView, ScrollView, TextInput } from 'react-native';
+import {
+    StyleSheet,
+    Text,
+    View,
+    KeyboardAvoidingView,
+    ScrollView,
+    TextInput
+} from 'react-native';
 import Cart from '../Components/Cart';
 import Button from '../Components/Button';
 import Colors from '../Constants/Colors';
@@ -122,7 +129,10 @@ const AuthScreen = (props) => {
     };
 
     return (
-        <KeyboardAvoidingView style={styles.screen} keyboardVerticalOffset={90} behavior="padding">
+        <KeyboardAvoidingView
+            style={styles.screen}
+            keyboardVerticalOffset={90}
+            behavior="padding">
             <View style={styles.screenContainer}>
                 <View style={styles.contetn}>
                     <Cart>
@@ -144,7 +154,9 @@ const AuthScreen = (props) => {
                                     autoCompleteType="email"
                                     returnKeyType="next"
                                     value={formState.values.emailAddress}
-                                    onChangeText={inputChangeHandler.bind(this, 'emailAddress')}
+                                    onChangeText={
+                                        inputChangeHandler.bind(this, 'emailAddress')
+                                    }
                                     onSubmitEditing={emailAddressSubmitHandler}
                                 />
                                 {formState.touches.emailAddress &&
@@ -177,12 +189,14 @@ const AuthScreen = (props) => {
                                     !formState.validities.password &&
                                     <Text style={styles.inputErrorText}>
                                         Your password must be at least 6 characters long,
-                                         contain at least lowercase letters and one number.
+                                        contain at least lowercase letters and one number.
                                 </Text>}
                             </View>
 
                             <View style={styles.actions}>
-                                <Button onPress={submitHandler} loading={loading}>{isLogIn ? 'Sign In' : 'Sign Up'}</Button>
+                                <Button onPress={submitHandler} loading={loading}>
+                                    {isLogIn ? 'Sign In' : 'Sign Up'}
+                                </Button>
                                 <Button style={{ height: 35 }}
                                     styleText={styles.swithLogInButtonText}
                                     filled={false}

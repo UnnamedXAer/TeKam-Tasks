@@ -9,7 +9,14 @@ import TaskCompleteCheckbox from './TaskCompleteCheckbox';
 import TaskMenu from './TaskMenu';
 import { MaterialCommunityIcons } from '@expo/vector-icons';
 
-const TaskListItem = ({ task, toggleTaskComplete, deleteTask, isLoading, isCompleted, error }) => {
+const TaskListItem = ({
+    task,
+    toggleTaskComplete,
+    deleteTask,
+    isLoading,
+    isCompleted,
+    error
+}) => {
     return (
         <Cart>
             <View style={styles.task}>
@@ -17,14 +24,18 @@ const TaskListItem = ({ task, toggleTaskComplete, deleteTask, isLoading, isCompl
                 <View style={styles.taskDateWrapper}>
                     <Text style={[
                         styles.taskDate,
-                        task.taskDate && new Date(task.taskDate) < new Date() ? { color: Colors.danger } : {}
+                        task.taskDate && new Date(task.taskDate) < new Date()
+                            ? { color: Colors.danger } : {}
                     ]}>
                         {task.taskDate && datefromNow(task.taskDate)}
                     </Text>
                 </View>
                 <View style={styles.titleWrapper}>
                     <Text style={styles.title} numberOfLines={2}>{task.title}</Text>
-                    <TaskCompleteCheckbox toggleTaskComplete={toggleTaskComplete} isLoading={isLoading} isCompleted={task.isCompleted} />
+                    <TaskCompleteCheckbox
+                        toggleTaskComplete={toggleTaskComplete}
+                        isLoading={isLoading}
+                        isCompleted={task.isCompleted} />
                 </View>
                 <View style={styles.details}>
 
@@ -32,7 +43,8 @@ const TaskListItem = ({ task, toggleTaskComplete, deleteTask, isLoading, isCompl
                         style={{
                             ...styles.detailText,
                             textAlign: 'center',
-                            fontWeight: task.importance === ImportanceLevel.HIGH ? 'bold' : 'normal'
+                            fontWeight: task.importance === ImportanceLevel.HIGH
+                                ? 'bold' : 'normal'
                         }}
                     >
                         {ImportanceLevel[task.importance]}
@@ -50,11 +62,15 @@ const TaskListItem = ({ task, toggleTaskComplete, deleteTask, isLoading, isCompl
                 </View>
 
                 {task.description ? <View style={styles.descriptionWrapper}>
-                    <Text style={styles.description} numberOfLines={3}>{task.description}</Text>
+                    <Text style={styles.description} numberOfLines={3}>
+                        {task.description}
+                    </Text>
                 </View> : null}
 
                 {task.isCompleted && <View style={styles.completedWrapper}>
-                    <Text style={styles.detailText}>Completed at {dateToLocalString(task.completedAt, true)}</Text>
+                    <Text style={styles.detailText}>
+                        Completed at {dateToLocalString(task.completedAt, true)}
+                    </Text>
                 </View>}
 
             </View>

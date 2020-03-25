@@ -3,14 +3,15 @@ import { View, ActivityIndicator } from 'react-native';
 import Header from '../Components/Header';
 import Colors from '../Constants/Colors';
 
-const EmptyScreen = () => {
+const AboutScreen = () => {
 
     return (
         <View>
-            <Header>Dummy Screen</Header>
-            {<ActivityIndicator color={Colors.secondary} size="large" />}
+            <Header>TeKam Tasks</Header>
+
+            
         </View>
     );
 };
 
-export default EmptyScreen;
+export default AboutScreen;

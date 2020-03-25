@@ -55,7 +55,8 @@ const TaskMenu = ({ isEnabled, deleteTask, toggleTaskComplete, isCompleted }) =>
 
 const styles = StyleSheet.create({
     menuButton: {
-        overflow: Platform.OS === 'android' && Platform.Version >= 21 ? 'hidden' : 'visible',
+        overflow: Platform.OS === 'android' && Platform.Version >= 21
+            ? 'hidden' : 'visible',
         position: 'absolute',
         left: -10, top: -10
     },

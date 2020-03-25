@@ -119,7 +119,7 @@ const toggleCompleteSuccess = (state, action) => {
     }
     else {
         const task = state.completed.find(x => x.id === id);
-        
+
         task.isCompleted = markAsCompleted;
         task.completedAt = completeDate;
         updatedCompletedTasks = state.completed.filter(x => x.id !== id);
@@ -263,7 +263,8 @@ const reducer = (state = initialState, action) => {
         case actionTypes.SAVE_NEW_TASK_SUCCESS: return saveNewTaskSuccess(state, action);
         case actionTypes.SAVE_NEW_TASK_FAIL: return saveNewTaskFail(state, action);
 
-        case actionTypes.SET_REDIRECT_FROM_NEW_TASK_SCREEN: return setRedirectFromNewTaskScreen(state, action);
+        case actionTypes.SET_REDIRECT_FROM_NEW_TASK_SCREEN:
+            return setRedirectFromNewTaskScreen(state, action);
 
         case actionTypes.DELETE_TASK_START: return deleteTaskStart(state, action);
         case actionTypes.DELETE_TASK_SUCCESS: return deleteTaskSuccess(state, action);

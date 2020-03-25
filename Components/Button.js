@@ -1,9 +1,9 @@
 import React from 'react';
 import { View, Text, StyleSheet, ActivityIndicator } from 'react-native';
-import { 
-    TouchableOpacity, 
-    TouchableNativeFeedback, 
-    TouchableWithoutFeedback 
+import {
+    TouchableOpacity,
+    TouchableNativeFeedback,
+    TouchableWithoutFeedback
 } from 'react-native-gesture-handler';
 import Colors from '../Constants/Colors';
 
@@ -30,7 +30,10 @@ const Button = ({
                 {loading
                     ? <ActivityIndicator color={Colors.primary} size="small" />
                     : <Text
-                        style={[styles.text, (disabled ? styles.disabledText : {}), styleText]}>
+                        style={[
+                            styles.text,
+                            (disabled ? styles.disabledText : {}),
+                            styleText]}>
                         {children}
                     </Text>}
             </View>

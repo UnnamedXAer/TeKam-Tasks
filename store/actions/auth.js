@@ -55,7 +55,11 @@ export const authorize = (emailAddress, password, isLogIn) => {
                     if (message === 'INVALID_EMAIL') {
                         throw new Error('The email address is not valid.');
                     }
-                    if (message === 'MISSING_PASSWORD' || message === 'WEAK_PASSWORD' || message === 'WEAK_PASSWORD : Password should be at least 6 characters') {
+                    if (
+                        message === 'MISSING_PASSWORD'
+                        || message === 'WEAK_PASSWORD'
+                        || message === 'WEAK_PASSWORD : Password should be at least 6 characters'
+                    ) {
                         throw new Error('Password should be at least 6 characters long.');
                     }
                     if (message === 'EMAIL_EXISTS') {

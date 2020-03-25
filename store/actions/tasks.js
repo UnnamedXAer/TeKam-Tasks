@@ -7,7 +7,8 @@ export const fetchTasks = (forCompleted = false) => {
         dispatch(fetchTasksStart(forCompleted));
         const { token, userId } = getState().auth;
 
-        const url = `/tasks/${userId}.json?orderBy="isCompleted"&equalTo=${forCompleted}&auth=${token}`;
+        const url = `/tasks/${userId}.json?orderBy="isCompleted"&equalTo=${
+            forCompleted}&auth=${token}`;
         try {
             const { data } = await axios.get(url);
             if (typeof data !== 'object') {
@@ -98,7 +99,8 @@ export const refreshTasks = (forCompleted = false) => {
     return async (dispatch, getState) => {
         dispatch(refreshTasksStart(forCompleted));
         const { token, userId } = getState().auth;
-        const url = `/tasks/${userId}.json?orderBy="isCompleted"&equalTo=${forCompleted}&auth=${token}`;
+        const url = `/tasks/${userId}.json?orderBy="isCompleted"&equalTo=${
+            forCompleted}&auth=${token}`;
         try {
             const { data } = await axios.get(url);
             if (typeof data !== 'object') {
@@ -140,9 +142,9 @@ export const saveNewTask = (task) => {
     return async (dispatch, getState) => {
         const { token, userId } = getState().auth;
         dispatch(saveNewTaskStart());
-
+        const url = `/tasks/${userId}.json?auth=${token}`;
         try {
-            const { data } = await axios.post(`/tasks/${userId}.json?auth=${token}`, task);
+            const { data } = await axios.post(url, task);
             task = { ...task, id: data.name };
             dispatch(saveNewTaskSuccess(task));
         }

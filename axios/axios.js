@@ -1,7 +1,8 @@
 import Axios from 'axios';
+import { API_URL } from '../env';
 
 const axios = Axios.create({
-    baseURL: 'https://rn-tasks.firebaseio.com',
+    baseURL: API_URL,
 });
 
 export default axios;
